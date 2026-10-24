@@ -30,7 +30,7 @@ export default function Navbar({ health }) {
       <nav className="hidden sm:flex items-center gap-6 ml-auto text-sm" aria-label="Sections">
         <a href="#how" className={linkCls}>How it works</a>
         <a href="#cases" className={linkCls}>Why it matters</a>
-        <a href="/xray.html" className={linkCls}>Network · Vendors · Watch</a>
+        <a href="#xray" className={linkCls}>Network · Vendors · Watch</a>
         {/* Investigate becomes a CTA pill */}
         <a
           href="#probe"

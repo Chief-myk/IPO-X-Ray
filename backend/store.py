@@ -223,6 +223,10 @@ def rebuild_from_cache(cache_dir: Path) -> int:
     """Re-ingest every cached agent response (used by demo mode and on startup)."""
     n = 0
     con = db()
+    # entities, facts, relations and scores are all derived from the cache, so start clean: stale rows from an
+    # older cache or older filters must not linger. Watchlist, snapshots and alerts are kept.
+    for t in ("vendor_score", "relation", "fact", "entity"):
+        con.execute(f"DELETE FROM {t}")
     for f in sorted(Path(cache_dir).glob("*.json")):
         try:
             if ingest(json.loads(f.read_text()), con):

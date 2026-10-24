@@ -222,7 +222,8 @@ def get_vendors():
 @app.get("/api/entities")
 def get_entities():
     con = store.db()
-    rows = [dict(r) for r in con.execute("SELECT id,kind,name FROM entity WHERE kind IN ('company','person','vendor') ORDER BY kind,name")]
+    rows = [dict(r) for r in con.execute("SELECT e.id,e.kind,e.name FROM entity e WHERE e.kind IN ('company','person','vendor') "
+        "ORDER BY e.kind, (SELECT COUNT(*) FROM relation r WHERE r.src_id=e.id OR r.dst_id=e.id) DESC, e.name")]
     con.close()
     return rows
 

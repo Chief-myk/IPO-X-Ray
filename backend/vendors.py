@@ -27,14 +27,16 @@ _MENTION = _obj(title=_s(), url=_s(), date=_s())
 
 def vendor_job(vendor: str, company: str = "", website: str | None = None) -> dict:
     ctx = f' (named as a vendor by "{company}")' if company else ""
-    goal = (f'Check whether "{vendor}"{ctx} is a real operating business, using public pages only. Find: does it have '
-            f"an official website and when was the domain registered (WHOIS); is there a Google Maps or business-directory "
-            f"listing at its stated address; how many employees show on LinkedIn or job portals; any independent news "
-            f"or directory mentions; and any court cases or regulator orders naming it. If something cannot be found, "
-            f"answer null for it, do not guess. Include source URLs. Be quick: a few searches are enough.")
-    start = f"https://{website}" if website and "//" not in website else (website or collect._search(f'"{vendor}" company India'))
+    goal = (f'Is "{vendor}"{ctx} a real operating business? Visit at most 5 pages in total, in this order, and then '
+            f"stop. (1) Search for it. (2) Open its company-registry page (ZaubaCorp, Tofler or filesure) for this exact "
+            f"company and read the incorporation date and status. (3) If it has an official website, open it and read "
+            f"the address and any WHOIS/domain date shown. (4) Note any independent news, court or regulator mention "
+            f"you happened to see. Do NOT return search results: answer only in the requested JSON, and use null for "
+            f"anything you did not see. Include source URLs.")
+    start = f"https://{website}" if website and "//" not in website else (website or collect._search(f'"{vendor}" company registry India'))
     schema = _top(
-        website_exists=_B, website_url=_s(), domain_created=_s(), domain_age_days=_N, listing_found=_B,
+        website_exists=_B, website_url=_s(), domain_created=_s(), domain_age_days=_N,
+        incorporation_date=_s(), company_age_days=_N, registry_status=_s(), listing_found=_B,
         listing_address=_s(), employees_estimate=_N, news_mentions=_arr(_MENTION, 5),
         court_or_regulator=_arr(_MENTION, 5), sources=_arr({"type": "string"}, 10))
     return {"label": f"vendor:{vendor}", "goal": goal, "url": start, "expect": list(schema["properties"]),
@@ -52,8 +54,12 @@ def score(res: dict) -> dict:
     out.append(check("website", CHECKS[0][1], 25, "unverified" if w is None else "pass" if w else "fail",
                      res.get("website_url") or "No official website found" if w is False else res.get("website_url") or "Not determined"))
     age = res.get("domain_age_days")
-    out.append(check("domain_age", CHECKS[1][1], 15, "unverified" if age is None else "pass" if age >= 365 else "fail",
-                     f"{int(age)} days old (registered {res.get('domain_created') or 'unknown'})" if age is not None else "Not determined"))
+    src_txt = f"domain registered {res.get('domain_created') or 'unknown'}"
+    if age is None:                                  # fall back to the registry incorporation date
+        age, src_txt = res.get("company_age_days"), f"incorporated {res.get('incorporation_date') or 'unknown'}"
+    out.append(check("domain_age", "Company or domain older than 1 year", 15,
+                     "unverified" if age is None else "pass" if age >= 365 else "fail",
+                     f"{int(age)} days old ({src_txt})" if age is not None else "Not determined"))
     lf = res.get("listing_found")
     out.append(check("listing", CHECKS[2][1], 20, "unverified" if lf is None else "pass" if lf else "fail",
                      res.get("listing_address") or ("No listing found at the address" if lf is False else "Not determined")))
