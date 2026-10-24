@@ -11,18 +11,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import autopsy
 import collect
+import database
+import debate
 import demo
 import drafts
 import hype
 import liquidity
 import network
+import promise_tracker
+import rag_chatbot
+import simulator
 import store
 import tinyfish
 import vendors
@@ -617,6 +622,7 @@ def make_draft(body: DraftIn):
 
 @app.get("/xray.html")
 @app.get("/xray.js")
+@app.get("/fahhh.mp3")
 def xray_asset(request: Request):
     return FileResponse(FRONTEND / "public" / request.url.path.lstrip("/"))
 

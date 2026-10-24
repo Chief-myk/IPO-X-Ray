@@ -113,10 +113,6 @@ def init_db():
 
 def seed_initial_data(conn: sqlite3.Connection):
     """Seed benchmark promise tracking records and sample investigation data."""
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) as cnt FROM promises")
-    if cursor.fetchone()["cnt"] > 0:
-        return
 
     # Seed Kalindi Smart Mobility Limited commitments
     sample_promises = [

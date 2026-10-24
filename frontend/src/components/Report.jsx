@@ -11,8 +11,8 @@ import {
   Award, 
   Info
 } from 'lucide-react';
-import React from 'react';
 import DraftPanel from './xray/DraftPanel.jsx';
+import { toast } from 'react-toastify';
 
 const SEV_NAMES = {
   critical: 'Critical',
@@ -74,12 +74,30 @@ function useAnimatedCount(targetValue = 0, duration = 800) {
   return displayValue;
 }
 
-export default function Report({ report, onReset }) {
+export default function Report({ report, onReset, onHighRisk }) {
+  const audioRef = useRef(null);
   const animatedScore = useAnimatedCount(report?.score ?? 0);
 
   if (!report) return null;
 
   const { company, score, verdict, summary, drivers, flags, verified, model, anomaly_pct, probability, disclaimer, demo } = report;
+
+  useEffect(() => {
+    if (score >= 60 || (probability && probability >= 0.6)) {
+      toast.error("too risky to invest", {
+        toastId: `risk-report-${company || 'report'}`,
+        position: "top-right",
+        autoClose: 6000,
+        theme: "dark",
+      });
+      if (onHighRisk) {
+        onHighRisk();
+      } else if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      }
+    }
+  }, [company, score, probability, onHighRisk]);
 
   const toneColor = 
     score >= 60 ? '#FF5A4E' : 
@@ -114,6 +132,8 @@ export default function Report({ report, onReset }) {
 
   return (
     <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-line" id="report">
+      {/* Audio element for high-risk alert sound */}
+      <audio ref={audioRef} src="/fahhh.mp3" preload="auto" />
       {/* Background ambient glow matching the verdict risk tone */}
       <div
         className="pointer-events-none absolute -top-40 -right-24 w-[36rem] h-[36rem] rounded-full blur-[150px] opacity-[0.14] transition-colors duration-1000 print:hidden"

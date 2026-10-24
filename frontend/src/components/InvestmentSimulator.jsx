@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Calculator, 
   TrendingUp, 
@@ -11,6 +11,7 @@ import {
   Percent,
   Sparkles
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const QUICK_AMOUNTS = [
   { label: '₹15,000 (1 Lot)', value: 15000 },
@@ -34,6 +35,7 @@ const QUICK_COMPANIES = [
 ];
 
 export default function InvestmentSimulator({ currentCompany, riskScore }) {
+  const audioRef = useRef(null);
   const [company, setCompany] = useState(currentCompany || 'Kalindi Smart Mobility Limited');
   const [amount, setAmount] = useState(15000);
   const [horizon, setHorizon] = useState(12);
@@ -60,6 +62,18 @@ export default function InvestmentSimulator({ currentCompany, riskScore }) {
       }
       const data = await res.json();
       setSimulation(data);
+      if (data.risk_score >= 60 || (data.risk_level && data.risk_level.toLowerCase().includes('high'))) {
+        toast.error("too risky to invest", {
+          toastId: `sim-risk-${compName}`,
+          position: "top-right",
+          autoClose: 5000,
+          theme: "dark",
+        });
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play().catch(() => {});
+        }
+      }
     } catch (err) {
       setError(err.message || 'Error running simulation.');
     } finally {
@@ -86,6 +100,8 @@ export default function InvestmentSimulator({ currentCompany, riskScore }) {
 
   return (
     <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-line" id="simulator">
+      {/* Audio element for high-risk alert sound */}
+      <audio ref={audioRef} src="/fahhh.mp3" preload="auto" />
       {/* Background ambient lighting */}
       <div className="pointer-events-none absolute top-1/3 left-1/4 w-[32rem] h-[32rem] rounded-full bg-beam/[0.06] blur-[150px]" aria-hidden="true" />
       <div className="pointer-events-none absolute bottom-10 right-10 w-[30rem] h-[30rem] rounded-full bg-critical/[0.05] blur-[140px]" aria-hidden="true" />

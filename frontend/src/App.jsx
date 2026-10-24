@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Methodology from './components/Methodology';
@@ -24,6 +26,21 @@ export default function App() {
   const eventSourceRef = useRef(null);
   const timerRef = useRef(null);
   const startTimeRef = useRef(0);
+  const audioRef = useRef(null);
+  const lastAudioPlayRef = useRef(0);
+
+  const playRiskSound = () => {
+    const now = Date.now();
+    if (now - lastAudioPlayRef.current < 2500) return;
+    lastAudioPlayRef.current = now;
+
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((err) => {
+        console.warn('Audio playback prevented by browser policy:', err);
+      });
+    }
+  };
 
   // Fetch API Health on startup
   useEffect(() => {
@@ -245,6 +262,15 @@ export default function App() {
         }
 
         case 'score': {
+          if (ev.score >= 60) {
+            toast.error("too risky to invest", {
+              toastId: `risk-live-${prev.company || 'score'}`,
+              position: "top-right",
+              autoClose: 5000,
+              theme: "dark",
+            });
+            playRiskSound();
+          }
           return {
             ...prev,
             score: ev.score,
@@ -253,6 +279,17 @@ export default function App() {
         }
 
         case 'report': {
+          const rep = ev.report;
+          if (rep && (rep.score >= 60 || rep.probability >= 0.6)) {
+            toast.error("too risky to invest", {
+              toastId: `risk-report-${rep.company || 'inv'}`,
+              position: "top-right",
+              autoClose: 6000,
+              theme: "dark",
+            });
+            playRiskSound();
+          }
+
           // Scroll smoothly to the completed report section
           setTimeout(() => {
             document.getElementById('report')?.scrollIntoView({ behavior: 'smooth' });
@@ -288,6 +325,30 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-film text-bone font-sans selection:bg-beam/30 selection:text-bone">
+      {/* Risk Alert Audio */}
+      <audio ref={audioRef} src="/fahhh.mp3" preload="auto" />
+
+      {/* Toast Notification Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          backgroundColor: '#121C26',
+          border: '1px solid #FF5A4E',
+          color: '#F6F5EE',
+          boxShadow: '0 10px 30px -5px rgba(255, 90, 78, 0.35)',
+          borderRadius: '12px',
+        }}
+      />
+
       {/* Navigation */}
       <Navbar health={health} />
 
@@ -323,6 +384,7 @@ export default function App() {
           <Report
             report={investigation.report}
             onReset={handleReset}
+            onHighRisk={playRiskSound}
           />
         )}
 
