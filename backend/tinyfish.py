@@ -87,6 +87,8 @@ async def run_agent(task):
         return
 
     body = {"url": task.url, "goal": task.goal}
+    if getattr(task, "schema", None):
+        body["output_schema"] = task.schema      # typed result; takes precedence over wording in the goal
     if cfg["stealth"]:
         body["browser_profile"] = "stealth"
     headers = {

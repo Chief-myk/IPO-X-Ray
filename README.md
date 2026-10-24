@@ -39,7 +39,15 @@ pip install -r requirements.txt
 cp .env.example .env                                     # add TINYFISH_API_KEY
 uvicorn main:app --reload --port 8000
 ```
-Open http://localhost:8000. The FastAPI server also serves the front end — no Node, no build.
+Open http://localhost:8000. The FastAPI server serves the React build from `frontend/dist` if it exists, otherwise the plain-HTML fallback in `frontend/legacy/` (no Node needed).
+
+React front end (Vite + Tailwind):
+```bash
+cd frontend && npm install
+npm run dev      # http://localhost:5173, proxies /api to :8000
+npm run build    # writes frontend/dist, which FastAPI then serves
+```
+The Network · Vendors · Watch page (`frontend/public/xray.html`) is plain HTML copied as-is into the build.
 
 Without a key, **Run the sample case** works fully (fictional company, simulated agents) — use it to rehearse and as a backup during judging.
 
@@ -90,7 +98,9 @@ If TinyFish's separate Search / Fetch endpoints are in your plan, add them in `t
 | `backend/ml/model.py` | Prediction + Shapley-value explanations |
 | `backend/ml/label.py` | Adds a real, labelled case to `ml/data/labeled_ipos.csv` |
 | `backend/demo.py` | Fictional sample case |
-| `frontend/` | index.html, styles.css, app.js (GSAP, ScrollTrigger, Lenis) |
+| `frontend/src/` | React app (Vite, Tailwind): App.jsx + components |
+| `frontend/public/` | xray.html, xray.js — network/vendor/watch page, static |
+| `frontend/legacy/` | old plain-HTML UI (GSAP, Lenis), fallback when there's no build |
 
 ## Three-minute judging script
 

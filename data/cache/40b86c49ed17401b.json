@@ -1,0 +1,100 @@
+{
+  "label": "relations:Trafiksol ITS Technologies",
+  "goal": "Open this public document about the SME IPO of \"Trafiksol ITS Technologies\": https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf . Use ONLY this document. List up to 8 companies or entities it names as vendors, suppliers, service providers or payees of the company, and up to 8 named as customers or clients, with any detail given and this URL as source_url. If it names none, return empty lists. Use only public pages, do not log in, and do not guess: if something cannot be found, return null or an empty list for it. Include the page URL where you saw each fact. Be quick and stop as soon as you have the answer.",
+  "url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+  "result": {
+    "vendors": [
+      {
+        "name": "Oasis Corpcare Pvt Ltd (Third-Party Vendor)",
+        "detail": "TPV whose quotation was relied upon in Trafiksol's prospectus for purchase of ICCC software. Purchase disclosed: Rs. 17.70 crore. TPV purported projects pipeline total Rs. 12.82 crore. Office found locked on site visit. Source: https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf (paras 13-19, 21-36, pages 4-13)",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Geneteck",
+        "detail": "Mentioned in prospectus as example of international vendor from whom Smart City ICCC solutions are typically sourced.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "NEC",
+        "detail": "Mentioned in prospectus as example of international vendor from whom Smart City ICCC solutions are typically sourced.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Hitachi",
+        "detail": "Mentioned in prospectus as example of international vendor from whom Smart City ICCC solutions are typically sourced.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Honeywell",
+        "detail": "Mentioned in prospectus as example of international vendor from whom Smart City ICCC solutions are typically sourced.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Ekadrisht Capital Private Limited",
+        "detail": "Book Running Lead Manager / Merchant Banker for the IPO. Address: 406, Summit Business Bay, Andheri Kurla Road, Andheri East, Mumbai-400093.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Murmuria & Associates / Sunil Murmuria",
+        "detail": "Chartered Accountant whose signature/UDIN appeared on TPV audited financial statements submitted to BSE.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Vijay Oswal",
+        "detail": "Middleman/intermediary who approached Kishanlal to provide a quotation to Trafiksol on commission.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      }
+    ],
+    "clients": [
+      {
+        "name": "Techno Industries Pvt. Ltd.",
+        "detail": "Named in TPV project pipeline as purported client to whom TPV was supplying software. During investigation, replied that it had no dealings with the TPV.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Havit Remedies Pvt. Ltd.",
+        "detail": "Named in TPV project pipeline as purported client to whom TPV was supplying software.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Manchanda Renewable Pvt. Ltd.",
+        "detail": "Named in TPV project pipeline as purported client to whom TPV was supplying software. During investigation, replied that it had no dealings with the TPV.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Investors (IPO Allottees)",
+        "detail": "Allottees of Trafiksol's IPO (issue raised Rs. 44.87 crore at Rs. 70 per share). SEBI directed refund of money paid.",
+        "website": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      }
+    ]
+  },
+  "sources": [
+    "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+  ],
+  "steps": [
+    {
+      "text": "Extract vendors, suppliers, service providers, payees, customers, and clients from the PDF",
+      "url": null
+    },
+    {
+      "text": "Return vendors and clients extracted from the SEBI SME IPO document",
+      "url": null
+    }
+  ],
+  "live_url": "https://ip-204-236-178-137.tetra-data.production.tinyfish.io/tf-af1d68f0-7873-460e-9215-3313f2b09c6b/stream/0",
+  "error": null,
+  "fetched_at": "2026-10-24T10:25:17Z",
+  "from_cache": false
+}

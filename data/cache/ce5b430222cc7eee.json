@@ -1,0 +1,45 @@
+{
+  "label": "company:Trafiksol ITS Technologies",
+  "goal": "Open the official website of the Indian company \"Trafiksol ITS Technologies\" (not a directory) and its Contact Us page. Return the registered or corporate office address, phone, email and the website URL exactly as printed there. Visit at most 3 pages of that site and nothing else. Return an empty people list. Put the contact page URL in source_url. Use only public pages, do not log in, and do not guess: if something cannot be found, return null or an empty list for it. Include the page URL where you saw each fact. Be quick and stop as soon as you have the answer.",
+  "url": "https://www.bing.com/search?q=%22Trafiksol+ITS+Technologies%22+official+website+contact+us",
+  "result": {
+    "company": {
+      "name": "Trafiksol ITS Technologies Limited",
+      "cin": "U72900UP2018PTC101608",
+      "status": "Active",
+      "role": "Noida",
+      "address": "G-187, 3rd Floor, Sector 63, Noida, Uttar Pradesh 201301",
+      "phone": "0120-4149514",
+      "email": "info@trafiksol.com",
+      "website": "https://www.trafiksol.com",
+      "source_url": "https://www.trafiksol.com/contact-us/"
+    },
+    "people": []
+  },
+  "sources": [
+    "https://www.trafiksol.com",
+    "https://www.trafiksol.com/contact-us/"
+  ],
+  "steps": [
+    {
+      "text": "Search for Trafiksol ITS Technologies official website",
+      "url": null
+    },
+    {
+      "text": "Visit Trafiksol Contact Us page for address, phone, email",
+      "url": null
+    },
+    {
+      "text": "Extract address from contact page",
+      "url": null
+    },
+    {
+      "text": "Return Trafiksol contact details",
+      "url": null
+    }
+  ],
+  "live_url": "https://ip-18-145-86-166.tetra-data.production.tinyfish.io/tf-9ab8833b-3f63-426f-96ff-8e1f83e673f7/stream/0",
+  "error": null,
+  "fetched_at": "2026-10-24T10:03:23Z",
+  "from_cache": false
+}

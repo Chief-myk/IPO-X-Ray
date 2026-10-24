@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPO X-Ray · Network, Vendors, Watch</title>
+<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<style>
+  :root { --bg:#0e1116; --panel:#171b22; --line:#262c36; --text:#e8ecf2; --mute:#8b94a3; --red:#ff5d5d; --amber:#f5b942; --green:#3fcf8e; --blue:#5aa2ff; --violet:#a78bfa; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif; }
+  a { color:var(--blue); word-break:break-all; }
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:14px 20px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:18px; margin:0; } header .sp { flex:1; }
+  .badge { font-size:12px; padding:3px 9px; border-radius:99px; border:1px solid var(--line); color:var(--mute); }
+  .badge.live { color:var(--green); border-color:var(--green); } .badge.demo { color:var(--amber); border-color:var(--amber); }
+  main { padding:20px; max-width:1300px; margin:0 auto; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  input, select, button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:9px 12px; font:inherit; }
+  input[type=text] { min-width:280px; flex:1; }
+  button { cursor:pointer; } button.primary { background:var(--blue); color:#06101f; border-color:var(--blue); font-weight:600; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .tabs { display:flex; gap:4px; margin:22px 0 14px; border-bottom:1px solid var(--line); }
+  .tab { border:0; border-radius:8px 8px 0 0; background:none; color:var(--mute); padding:10px 16px; }
+  .tab.on { color:var(--text); background:var(--panel); border-bottom:2px solid var(--blue); }
+  .panel { display:none; } .panel.on { display:block; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .lanes { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:10px; margin-top:14px; }
+  .lane .t { font-weight:600; } .lane .k { color:var(--mute); font-size:12px; text-transform:uppercase; letter-spacing:.05em; }
+  .lane .s { color:var(--mute); font-size:13px; margin-top:6px; max-height:64px; overflow:hidden; }
+  .lane.done { border-color:var(--green); } .lane.fail { border-color:var(--amber); }
+  .phase { margin-top:12px; color:var(--blue); }
+  #graph { height:560px; background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+  .split { display:grid; grid-template-columns:1fr 340px; gap:14px; } @media (max-width:900px){ .split { grid-template-columns:1fr; } }
+  .flag { border-left:3px solid var(--red); padding:6px 10px; margin:8px 0; background:#2a1717; border-radius:0 8px 8px 0; font-size:14px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; margin-right:14px; color:var(--mute); font-size:13px; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .vgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:14px; }
+  .bar { height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin:8px 0; } .bar i { display:block; height:100%; }
+  .score { font-size:30px; font-weight:700; }
+  .chk { display:flex; gap:8px; font-size:13px; padding:3px 0; } .chk b { width:74px; flex:none; }
+  .pass b { color:var(--green); } .fail b { color:var(--red); } .unverified b { color:var(--amber); }
+  .tag { font-size:12px; padding:2px 8px; border-radius:99px; background:#2a1717; color:var(--red); border:1px solid var(--red); }
+  .tag.sim { background:#2a2411; color:var(--amber); border-color:var(--amber); }
+  .alert { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); } .alert time { color:var(--mute); width:160px; flex:none; font-size:13px; }
+  .muted { color:var(--mute); } small.note { color:var(--mute); }
+</style>
+</head>
+<body>
+<header>
+  <h1>IPO X-Ray</h1><span class="muted">Promoter network · Vendor reality · Live watch</span>
+  <span class="sp"></span><span id="mode" class="badge">…</span><a href="/">← Main investigation</a>
+</header>
+<main>
+  <div class="card">
+    <div class="row">
+      <select id="kind"><option value="company">Company / IPO</option><option value="director">Director / promoter</option><option value="vendor">Vendor</option></select>
+      <input type="text" id="name" placeholder="e.g. Trafiksol ITS Technologies" list="ents">
+      <datalist id="ents"></datalist>
+      <label class="muted"><input type="checkbox" id="refresh"> re-run agents (ignore cache)</label>
+      <button class="primary" id="go">Run TinyFish agents</button>
+    </div>
+    <div id="phase" class="phase"></div>
+    <div id="lanes" class="lanes"></div>
+    <small class="note">Agents get a goal, not a script: they decide which public sites to open. Everything below is a red flag / needs review, never a verdict, and each finding links its source.</small>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-p="net">Promoter network</button>
+    <button class="tab" data-p="ven">Vendor scorecards</button>
+    <button class="tab" data-p="alr">Live watch</button>
+  </div>
+
+  <section id="net" class="panel on">
+    <div class="row" style="margin-bottom:10px">
+      <input type="text" id="q" placeholder="Person or company to map" list="ents">
+      <select id="depth"><option>1</option><option selected>2</option><option>3</option></select><span class="muted">levels</span>
+      <button id="map">Show network</button>
+    </div>
+    <div class="legend" style="margin-bottom:8px">
+      <span><i class="dot" style="background:#5aa2ff"></i>Company</span><span><i class="dot" style="background:#a78bfa"></i>Person</span>
+      <span><i class="dot" style="background:#f59e42"></i>Vendor</span><span><i class="dot" style="background:#8b94a3"></i>Address / phone / email</span>
+      <span><i class="dot" style="background:#ff5d5d"></i>Red-flag link (shared or repeated)</span>
+    </div>
+    <div class="split"><div id="graph"></div><div><div class="card" id="detail"><span class="muted">Click a node or link to see its details and sources.</span></div><div id="flags"></div></div></div>
+  </section>
+
+  <section id="ven" class="panel"><div id="vgrid" class="vgrid"></div></section>
+
+  <section id="alr" class="panel">
+    <div class="row" style="margin-bottom:10px">
+      <input type="text" id="wname" placeholder="Company or vendor to watch" list="ents">
+      <button id="wadd">Add to watchlist</button><button id="wrun">Re-run checks now</button>
+      <button id="wsim" title="Adds a clearly labelled SIMULATED change so you can show an alert on stage">Simulate a change (demo)</button>
+    </div>
+    <div class="muted" id="wlist" style="margin-bottom:10px"></div>
+    <div class="card" id="feed"><span class="muted">No changes recorded yet.</span></div>
+  </section>
+</main>
+<script src="xray.js"></script>
+</body>
+</html>

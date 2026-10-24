@@ -1,0 +1,79 @@
+{
+  "label": "company:Trafiksol ITS Technologies",
+  "goal": "Open this public document about the SME IPO of \"Trafiksol ITS Technologies\": https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf . Use ONLY this document. Return the company's registered address and the directors/promoters it names, with DIN and role if given, and this URL as source_url. Leave anything not in it as null. Use only public pages, do not log in, and do not guess: if something cannot be found, return null or an empty list for it. Include the page URL where you saw each fact. Be quick and stop as soon as you have the answer.",
+  "url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf",
+  "result": {
+    "company": {
+      "name": "Trafiksol ITS Technologies Ltd.",
+      "cin": null,
+      "status": null,
+      "role": null,
+      "address": "2nd Floor, B-68, Sector 63, Noida, Uttar Pradesh",
+      "phone": null,
+      "email": null,
+      "website": null,
+      "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+    },
+    "people": [
+      {
+        "name": "Jitendra Das",
+        "din": null,
+        "role": "Director / Promoter (Managing Director of the Company)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Akshay Prajapat",
+        "din": null,
+        "role": "Director of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Kishan Lal Prajapat (Kishanlal Bholu Ram Kumhar)",
+        "din": null,
+        "role": "Director of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Avesh Amrutlal Patel",
+        "din": null,
+        "role": "Ex-director and shareholder of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Sudhakar Duggappa Shetty",
+        "din": null,
+        "role": "Ex-director and shareholder of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Vijay Vittala Kunder",
+        "din": null,
+        "role": "Ex-director and shareholder of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      },
+      {
+        "name": "Uday Balkrishna Shirke",
+        "din": null,
+        "role": "Former director of the Third-Party Vendor (TPV)",
+        "source_url": "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+      }
+    ]
+  },
+  "sources": [
+    "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733225149153.pdf"
+  ],
+  "steps": [
+    {
+      "text": "Extract registered address and directors/promoters with DIN from SME IPO document",
+      "url": null
+    },
+    {
+      "text": "Return company registered address and directors/promoters from SME IPO document",
+      "url": null
+    }
+  ],
+  "live_url": "https://ip-54-177-234-113.tetra-data.production.tinyfish.io/tf-726a3d07-a530-43c3-930b-13fdb2dda392/stream/0",
+  "error": null,
+  "fetched_at": "2026-10-24T10:09:55Z",
+  "from_cache": false
+}
