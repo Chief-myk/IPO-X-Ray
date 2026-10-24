@@ -1,4 +1,5 @@
 import React from 'react';
+import DraftPanel from './xray/DraftPanel.jsx';
 
 const SEV_NAMES = {
   critical: 'Critical',
@@ -243,6 +244,9 @@ export default function Report({ report, onReset }) {
               <button onClick={onReset} className={ghostBtn}>
                 Investigate another IPO
               </button>
+            </div>
+            <div className="print:hidden mt-2.5">
+              <DraftPanel source="ipo_report" data={report} subject={company} label="Draft a SEBI / exchange complaint or RTI" />
             </div>
 
             <p className="mt-6 pl-4 border-l-2 border-line text-xs text-bone-dim leading-relaxed max-w-[50ch]">

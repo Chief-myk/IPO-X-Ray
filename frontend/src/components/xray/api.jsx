@@ -13,6 +13,49 @@ export function form(fields) {
   return f;
 }
 
+/** Follows a run's event stream. Returns the EventSource so the caller can close it. */
+export function streamRun(id, onEvent, onEnd) {
+  const es = new EventSource(`/api/investigations/${id}/stream`);
+  es.onmessage = (m) => {
+    let e;
+    try { e = JSON.parse(m.data); } catch { return; }
+    onEvent(e);
+  };
+  es.addEventListener('end', () => { es.close(); onEnd?.(); });
+  es.onerror = () => { es.close(); onEnd?.(); };
+  return es;
+}
+
+/** Keeps one lane per agent from agent_* events. */
+export function laneReducer(lanes, e) {
+  if (e.type === 'reset') return {};
+  if (e.type === 'agent_start') return { ...lanes, [e.agent.id]: { ...e.agent, text: 'Starting…', state: 'run' } };
+  if (!lanes[e.id]) return lanes;
+  if (e.type === 'agent_step') return { ...lanes, [e.id]: { ...lanes[e.id], text: e.text, err: !!e.error } };
+  if (e.type === 'agent_live') return { ...lanes, [e.id]: { ...lanes[e.id], live: e.url } };
+  if (e.type === 'agent_done') return { ...lanes, [e.id]: { ...lanes[e.id], state: e.ok ? 'done' : 'fail', error: e.error, cache: e.from_cache } };
+  return lanes;
+}
+
+export function Lanes({ lanes }) {
+  const list = Object.entries(lanes);
+  if (!list.length) return null;
+  return (
+    <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {list.map(([id, a]) => (
+        <div key={id} className={`rounded-xl border p-3 bg-film/60 ${a.state === 'done' ? 'border-clear/60' : a.state === 'fail' ? 'border-medium/60' : 'border-line'}`}>
+          <div className="text-[11px] uppercase tracking-wider text-bone-dim">{a.kind.replace('_', ' ')} agent</div>
+          <div className="font-semibold text-sm text-bone truncate" title={a.target}>{a.target}</div>
+          <div className={`text-xs mt-1.5 line-clamp-2 ${a.err ? 'text-medium' : 'text-bone-dim'}`}>
+            {a.state === 'done' ? `Done${a.cache ? ' (from cache)' : ''}` : a.state === 'fail' ? (a.error || 'Not found') : a.text}
+          </div>
+          {a.live && <div className="text-xs mt-1"><SourceLink url={a.live}>Watch the browser live</SourceLink></div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Findings come from the open web, so only ever link real http(s) URLs. */
 export function SourceLink({ url, children = 'source' }) {
   if (typeof url !== 'string' || !/^https?:\/\//.test(url)) return null;

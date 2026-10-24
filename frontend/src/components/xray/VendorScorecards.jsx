@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { api, SourceLink, btnCls } from './api.jsx';
+import DraftPanel from './DraftPanel.jsx';
 
 const STATUS = {
   pass: { t: 'pass', cls: 'text-clear' },
   fail: { t: 'fail', cls: 'text-critical' },
+  partial: { t: 'partial', cls: 'text-medium' },
   unverified: { t: 'unverified', cls: 'text-medium' },
 };
 
@@ -14,7 +16,14 @@ export default function VendorScorecards({ refreshKey, onCheck }) {
   if (!rows) return <p className="text-bone-dim text-sm">Loading…</p>;
   if (!rows.length) return <p className="text-bone-dim text-sm">No vendors stored yet. Run a company above to pull its vendors from the offer document.</p>;
 
+  const weak = rows.filter((v) => (v.score != null && v.score < 40) || v.multi_company_flag);
   return (
+    <>
+    {weak.length > 0 && (
+      <div className="mb-4">
+        <DraftPanel source="vendor" data={{ vendors: weak }} label={`Draft a complaint about ${weak.length} weak vendor${weak.length > 1 ? 's' : ''}`} />
+      </div>
+    )}
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rows.map((v) => {
         const col = v.score == null ? '#8EA3B5' : v.score >= 70 ? '#8FE0AE' : v.score >= 40 ? '#FFC23D' : '#FF5A4E';
@@ -46,7 +55,7 @@ export default function VendorScorecards({ refreshKey, onCheck }) {
                 <ul className="space-y-1 mt-2">
                   {v.checks.map((c) => (
                     <li key={c.key} className="flex gap-2 text-xs">
-                      <b className={`w-[78px] shrink-0 ${STATUS[c.status].cls}`}>{c.status === 'pass' ? '✓' : c.status === 'fail' ? '✗' : '?'} {STATUS[c.status].t}</b>
+                      <b className={`w-[78px] shrink-0 ${(STATUS[c.status] || STATUS.unverified).cls}`}>{c.status === 'pass' ? '✓' : c.status === 'fail' ? '✗' : c.status === 'partial' ? '½' : '?'} {(STATUS[c.status] || STATUS.unverified).t}</b>
                       <span className="text-bone">{c.label} <span className="text-bone-dim">· {c.detail} ({c.points}/{c.max})</span></span>
                     </li>
                   ))}
@@ -61,5 +70,6 @@ export default function VendorScorecards({ refreshKey, onCheck }) {
         );
       })}
     </div>
+    </>
   );
 }

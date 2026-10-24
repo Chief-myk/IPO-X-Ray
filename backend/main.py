@@ -1,6 +1,8 @@
 import asyncio
+import copy
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -11,9 +13,14 @@ load_dotenv()
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
+import autopsy
 import collect
 import demo
+import drafts
+import hype
+import liquidity
 import network
 import store
 import tinyfish
@@ -142,8 +149,11 @@ def mode():
     return {"demo": collect.demo_mode(), "live": tinyfish.is_live(), "cache_dir": str(collect.CACHE_DIR)}
 
 
-async def _flow(inv: Investigation, kind: str, name: str, refresh: bool):
+def _stager(inv: Investigation, refresh: bool, ingest: bool = True):
+    """Returns stage(jobs, label): runs agents in parallel and streams each one as a lane in the UI.
+    ingest=False keeps results out of the entity store (used for scam checks and influencer calls)."""
     ids: dict[str, str] = {}
+    started: set[str] = set()
 
     async def cb(label, ev):
         aid = ids.setdefault(label, f"a{len(ids) + 1}")
@@ -157,18 +167,33 @@ async def _flow(inv: Investigation, kind: str, name: str, refresh: bool):
         elif ev["kind"] == "error":
             await inv.emit("agent_step", id=aid, text=ev["text"], error=True)
 
-    started: set[str] = set()
-
     async def stage(jobs, label):
         await inv.emit("phase", phase=label, label=label)
         recs = await collect.collect_many(jobs, refresh=refresh, on_event=cb)
         for r, j in zip(recs, jobs):
-            store.ingest(r)
-            if j["label"].startswith("vendor:"):
-                vendors.save(r, j["label"].partition(":")[2])
+            if j["label"] not in ids:   # the run failed before any event (no key, demo cache miss): still show its lane
+                await cb(j["label"], {"kind": "none"})
+            if ingest:
+                store.ingest(r)
+                if j["label"].startswith("vendor:"):
+                    vendors.save(r, j["label"].partition(":")[2])
             await inv.emit("agent_done", id=ids.get(j["label"]), label=j["label"], ok=r.get("result") is not None,
                            error=r.get("error"), from_cache=r.get("from_cache"), sources=r.get("sources", [])[:6])
         return recs
+
+    return stage
+
+
+def _start(inv: Investigation, coro):
+    _cleanup_runs()
+    RUNS[inv.id] = inv
+    t = asyncio.create_task(coro)
+    BACKGROUND.add(t)
+    t.add_done_callback(BACKGROUND.discard)
+
+
+async def _flow(inv: Investigation, kind: str, name: str, refresh: bool):
+    stage = _stager(inv, refresh)
 
     try:
         if kind == "director":
@@ -202,10 +227,7 @@ async def start_run(kind: str = Form("company"), name: str = Form(...), refresh:
     if not collect.demo_mode() and not tinyfish.is_live():
         raise HTTPException(400, "Set TINYFISH_API_KEY in backend/.env, or run with DEMO_MODE=1 to use the cache.")
     inv = Investigation(name, collect.demo_mode())
-    RUNS[inv.id] = inv
-    t = asyncio.create_task(_flow(inv, kind, name, refresh))
-    BACKGROUND.add(t)
-    t.add_done_callback(BACKGROUND.discard)
+    _start(inv, _flow(inv, kind, name, refresh))
     return {"id": inv.id, "name": name, "kind": kind}
 
 
@@ -252,6 +274,167 @@ async def run_watch(name: str = Form("")):
 def simulate_watch(name: str = Form(...)):
     watch.add(name.strip())
     return {"changes": watch.simulate(name.strip())}
+
+
+# ---- Claim autopsy, Truth vs Hype, Can I exit?, complaint/RTI drafts --------------------------------
+
+def _agents_available() -> bool:
+    return collect.demo_mode() or tinyfish.is_live()
+
+
+async def _autopsy_flow(inv: Investigation, text: str, url: str, check: bool, refresh: bool):
+    stage = _stager(inv, refresh, ingest=False)
+    try:
+        title = None
+        if url:
+            if _agents_available():
+                rec = (await stage([autopsy.page_job(url)], "Reading the link"))[0]
+                page = rec.get("result") or {}
+                if page.get("text") or page.get("title"):
+                    title = page.get("title")
+                    text = "\n".join(x for x in (page.get("title"), page.get("author"), page.get("date"), page.get("text"), text) if x)
+                else:
+                    await inv.emit("phase", phase="read", label=f"Could not read the link: {rec.get('error') or 'no text returned'}")
+            else:
+                await inv.emit("phase", phase="read", label="Links need TINYFISH_API_KEY (or DEMO_MODE=1). Analysing the pasted text only.")
+        if not text.strip():
+            await inv.emit("error", message="Nothing to analyse. Paste the message, upload a file, or give a readable link.")
+            return
+        await inv.emit("phase", phase="analyse", label="Finding promises, names and payment instructions")
+        analysis = autopsy.analyze(text, await autopsy.ai_entities(text))
+        meta = {"title": title, "source_url": url or None, "input_text": text[:autopsy.MAX_TEXT]}
+        await inv.emit("autopsy", report=autopsy.finalize(copy.deepcopy(analysis), [], {**meta, "partial": check}))
+        checks = []
+        jobs = autopsy.plan_checks(analysis) if check else []
+        if jobs:
+            recs = await stage(jobs, "Checking official records (SEBI, exchanges, company registry)")
+            checks = [autopsy.judge(j, r, analysis) for j, r in zip(jobs, recs)]
+        await inv.emit("autopsy", report=autopsy.finalize(analysis, checks, {**meta, "partial": False}))
+        await inv.emit("done")
+    except Exception as exc:
+        await inv.emit("error", message=f"{exc.__class__.__name__}: {exc}")
+    finally:
+        await inv.finish()
+
+
+@app.get("/api/autopsy/sample")
+def autopsy_sample():
+    return {"text": autopsy.SAMPLE}
+
+
+@app.post("/api/autopsy")
+async def start_autopsy(text: str = Form(""), url: str = Form(""), check: bool = Form(True), refresh: bool = Form(False),
+                        file: UploadFile | None = File(None)):
+    text, url = text.strip(), url.strip()
+    if url and not re.match(r"https?://", url):
+        raise HTTPException(400, "The link must start with http:// or https://")
+    if file is not None and file.filename:
+        data = await file.read()
+        if len(data) > 25 * 1024 * 1024:
+            raise HTTPException(400, "That file is over 25 MB.")
+        got, err = await autopsy.read_file(data, file.filename, file.content_type or "")
+        if err and not (text or url):
+            raise HTTPException(400, err)
+        text = "\n".join(x for x in (text, got) if x)
+    if not (text or url):
+        raise HTTPException(400, "Paste the message, upload a screenshot/PDF, or give a link.")
+    inv = Investigation("Claim autopsy", collect.demo_mode())
+    _start(inv, _autopsy_flow(inv, text, url, check and _agents_available(), refresh))
+    return {"id": inv.id, "agents": check and _agents_available()}
+
+
+class LiquidityIn(BaseModel):
+    symbol: str | None = None
+    shares: int | None = Field(None, gt=0)
+    amount: float | None = Field(None, gt=0)
+    price: float | None = Field(None, gt=0)
+    daily_volume: float | None = Field(None, ge=0)
+    volatility_pct: float | None = Field(None, gt=0, le=50)
+    lot_size: int = Field(1, ge=1)
+    band_pct: float = Field(5.0, gt=0, le=20)
+    participation_pct: float = Field(10.0, gt=0, le=100)
+    drop_pct: float = Field(20.0, gt=0, lt=100)
+    lc_days: int | None = Field(None, ge=0, le=60)
+    lc_buyer_pct: float = Field(5.0, ge=0, le=100)
+    lockin_shares: int | None = Field(None, gt=0)
+    lockin_sell_pct: float = Field(25.0, ge=0, le=100)
+
+
+@app.post("/api/liquidity")
+async def run_liquidity(body: LiquidityIn):
+    if not (body.shares or body.amount):
+        raise HTTPException(400, "Enter how many shares you hold, or the amount invested.")
+    if not (body.symbol or "").strip() and not (body.price and body.daily_volume is not None):
+        raise HTTPException(400, "Enter a stock symbol, or the price and average daily volume.")
+    args = body.model_dump()
+    args["symbol"] = (body.symbol or "").strip() or None
+    out = await asyncio.to_thread(lambda: liquidity.simulate(**args))
+    if not out["ok"]:
+        raise HTTPException(400, " ".join([out["error"], *out.get("notes", [])]))
+    return out
+
+
+class HypeAuditIn(BaseModel):
+    calls: list[dict]
+    horizon: int = Field(hype.DEFAULT_HORIZON, ge=1, le=250)
+    cost_pct: float = Field(hype.DEFAULT_COST_PCT, ge=0, le=5)
+    claimed_accuracy: float | None = Field(None, ge=0, le=100)
+
+
+@app.post("/api/hype/parse")
+def hype_parse(text: str = Form(...)):
+    return hype.parse_text(text)
+
+
+@app.post("/api/hype/audit")
+async def hype_audit(body: HypeAuditIn):
+    if not body.calls:
+        raise HTTPException(400, "No calls to audit. Paste dated calls such as '2024-03-12 BUY TATAPOWER target 450 sl 380'.")
+    return await asyncio.to_thread(hype.audit, body.calls, body.horizon, body.cost_pct, body.claimed_accuracy)
+
+
+async def _calls_flow(inv: Investigation, handle: str, refresh: bool):
+    stage = _stager(inv, refresh, ingest=False)
+    try:
+        rec = (await stage([hype.collect_job(handle)], "Collecting public, dated calls"))[0]
+        await inv.emit("calls", calls=hype.from_agent(rec.get("result")), error=rec.get("error"))
+        await inv.emit("done")
+    except Exception as exc:
+        await inv.emit("error", message=f"{exc.__class__.__name__}: {exc}")
+    finally:
+        await inv.finish()
+
+
+@app.post("/api/hype/collect")
+async def hype_collect(handle: str = Form(...), refresh: bool = Form(False)):
+    handle = handle.strip()
+    if not handle:
+        raise HTTPException(400, "Give a public Telegram channel link, a page URL, or the influencer's name/handle.")
+    if not _agents_available():
+        raise HTTPException(400, "Collecting calls needs TINYFISH_API_KEY in backend/.env. Paste the calls instead.")
+    inv = Investigation(handle, collect.demo_mode())
+    _start(inv, _calls_flow(inv, handle, refresh))
+    return {"id": inv.id}
+
+
+class DraftIn(BaseModel):
+    kind: str
+    source: str
+    data: dict = {}
+    complainant: dict = {}
+    subject: str | None = None
+
+
+@app.get("/api/drafts/kinds")
+def draft_kinds():
+    return drafts.KINDS
+
+
+@app.post("/api/drafts")
+def make_draft(body: DraftIn):
+    if body.kind not in drafts.KINDS:
+        raise HTTPException(400, f"Unknown draft type. Use one of: {', '.join(drafts.KINDS)}")
+    return drafts.draft(body.kind, body.source, body.data, body.complainant, body.subject)
 
 
 @app.get("/xray.html")

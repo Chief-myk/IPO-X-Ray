@@ -5,6 +5,7 @@ import Methodology from './components/Methodology';
 import Cases from './components/Cases';
 import LiveInvestigation from './components/LiveInvestigation';
 import XRay from './components/xray/XRay';
+import Shield from './components/xray/Shield';
 import Report from './components/Report';
 import Footer from './components/Footer';
 
@@ -303,6 +304,7 @@ export default function App() {
 
         {/* Promoter network, vendor scorecards, live watch */}
         <XRay />
+        <Shield />
 
         {/* Live Investigation Monitor */}
         {investigation && (

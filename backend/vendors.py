@@ -13,7 +13,7 @@ from store import db, now, upsert_entity
 
 CHECKS = [  # key, label, max points
     ("website", "Official website exists", 25),
-    ("domain_age", "Domain older than 1 year", 15),
+    ("domain_age", "Company or domain older than 1 year", 15),
     ("listing", "Business listing at the stated address", 20),
     ("employees", "Visible employees (LinkedIn / job portals)", 20),
     ("news", "Independent news or directory mentions", 10),
@@ -57,25 +57,25 @@ def score(res: dict) -> dict:
     src_txt = f"domain registered {res.get('domain_created') or 'unknown'}"
     if age is None:                                  # fall back to the registry incorporation date
         age, src_txt = res.get("company_age_days"), f"incorporated {res.get('incorporation_date') or 'unknown'}"
-    out.append(check("domain_age", "Company or domain older than 1 year", 15,
+    out.append(check("domain_age", CHECKS[1][1], 15,
                      "unverified" if age is None else "pass" if age >= 365 else "fail",
                      f"{int(age)} days old ({src_txt})" if age is not None else "Not determined"))
     lf = res.get("listing_found")
     out.append(check("listing", CHECKS[2][1], 20, "unverified" if lf is None else "pass" if lf else "fail",
                      res.get("listing_address") or ("No listing found at the address" if lf is False else "Not determined")))
     emp = res.get("employees_estimate")
-    half = emp is not None and 2 <= emp < 10
-    c = check("employees", CHECKS[3][1], 20, "unverified" if emp is None else "pass" if emp >= 10 else "fail",
+    c = check("employees", CHECKS[3][1], 20,
+              "unverified" if emp is None else "pass" if emp >= 10 else "partial" if emp >= 2 else "fail",
               f"About {int(emp)} visible" if emp is not None else "Not determined")
-    if half:
+    if c["status"] == "partial":   # a handful of visible staff earns half
         c["points"] = 10
     out.append(c)
     news = res.get("news_mentions")
     out.append(check("news", CHECKS[4][1], 10, "unverified" if news is None else "pass" if news else "fail",
-                     f"{len(news)} mention(s)" if news else "No independent mentions found"))
+                     "Not determined" if news is None else f"{len(news)} mention(s)" if news else "No independent mentions found"))
     cr = res.get("court_or_regulator")
     out.append(check("clean_record", CHECKS[5][1], 10, "unverified" if cr is None else "pass" if not cr else "fail",
-                     f"{len(cr)} mention(s) need review" if cr else "None found"))
+                     "Not determined" if cr is None else f"{len(cr)} mention(s) need review" if cr else "None found"))
     total = sum(c["points"] for c in out)
     return {"score": total, "checks": out}
 

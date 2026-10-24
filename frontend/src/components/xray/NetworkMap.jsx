@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Network, DataSet } from 'vis-network/standalone';
 import { api, SourceLink, inputCls, btnCls } from './api.jsx';
+import DraftPanel from './DraftPanel.jsx';
 
 const COLOR = { company: '#7FD8E8', person: '#C9B8FF', vendor: '#FF8A3D', address: '#8EA3B5', phone: '#8EA3B5', email: '#8EA3B5' };
 const SHAPE = { company: 'box', person: 'dot', vendor: 'diamond', address: 'triangle', phone: 'triangle', email: 'triangle' };
@@ -35,7 +36,7 @@ export default function NetworkMap({ subject, refreshKey }) {
       color: { color: e.flagged ? '#FF5A4E' : '#3a5673' }, width: e.flagged ? 4 : 1.2,
       dashes: !e.flagged && e.rel.startsWith('HAS'), font: { color: '#9FB2C2', size: 10, strokeWidth: 0 },
     })));
-    const net = new Network(box.current, { nodes, edges }, { physics: { stabilization: 120, barnesHut: { springLength: 130 } }, interaction: { hover: true } });
+    const net = new Network(box.current, { nodes, edges }, { physics: { stabilization: { iterations: 120 }, barnesHut: { springLength: 130 } }, interaction: { hover: true } });
     net.on('click', (p) => {
       if (p.nodes.length) setSel({ node: data.nodes.find((n) => n.id === p.nodes[0]) });
       else if (p.edges.length) setSel({ edge: data.edges.find((e) => e.id === p.edges[0]) });
@@ -100,6 +101,7 @@ export default function NetworkMap({ subject, refreshKey }) {
                 <div className="rounded-2xl border border-critical/40 bg-critical/5 p-4 text-sm">
                   <h4 className="font-semibold text-bone mb-2">Red flags (need review)</h4>
                   {data.flags.map((f, i) => <p key={i} className="border-l-2 border-critical pl-3 py-1">{f.reason}</p>)}
+                  <div className="mt-3"><DraftPanel source="network" data={data} label="Draft a complaint / RTI" /></div>
                 </div>
               )
               : <p className="text-sm text-bone-dim">No shared address, phone, email or repeated vendor in the stored data.</p>

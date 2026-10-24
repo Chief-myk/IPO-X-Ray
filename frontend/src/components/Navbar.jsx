@@ -31,6 +31,7 @@ export default function Navbar({ health }) {
         <a href="#how" className={linkCls}>How it works</a>
         <a href="#cases" className={linkCls}>Why it matters</a>
         <a href="#xray" className={linkCls}>Network · Vendors · Watch</a>
+        <a href="#shield" className={linkCls}>Before you invest</a>
         {/* Investigate becomes a CTA pill */}
         <a
           href="#probe"
