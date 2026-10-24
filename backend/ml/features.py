@@ -47,9 +47,9 @@ def _urls(items):
     return out[:5]
 
 
-def _sig(task, feature, title, detail, evidence=None):
+def _sig(task, feature, title, detail, evidence=None, val=None):
     return {"agent": task["id"], "claim_id": task["claim_id"], "kind": task["kind"], "target": task["target"],
-            "feature": feature, "title": title, "detail": detail, "evidence": _urls(evidence)}
+            "feature": feature, "title": title, "detail": detail, "evidence": _urls(evidence), "val": val}
 
 
 def build(outcomes):
@@ -84,14 +84,14 @@ def build(outcomes):
             e = _num(r.get("employees_estimate"))
             if e is not None:
                 acc["vendor_emp"].append(e)
-                sig["vendor_min_employees"].append(_sig(t, "vendor_min_employees", f"About {int(e)} visible employee{'s' if e != 1 else ''}", "Estimated from LinkedIn, job posts and directories.", src))
+                sig["vendor_min_employees"].append(_sig(t, "vendor_min_employees", f"About {int(e)} visible employee{'s' if e != 1 else ''}", "Estimated from LinkedIn, job posts and directories.", src, val=e))
 
         elif k == "domain_age":
             a = _num(r.get("age_days"))
             if a is not None:
                 acc["ages"].append(a)
                 sig["min_domain_age_days"].append(_sig(t, "min_domain_age_days", f"Website is {int(a)} days old",
-                    f"{r.get('domain', t['target'])} was registered on {r.get('created', 'an unknown date')}."))
+                    f"{r.get('domain', t['target'])} was registered on {r.get('created', 'an unknown date')}.", val=a))
 
         elif k == "client_mention":
             unconf = r.get("mentions_found") is False
@@ -113,7 +113,7 @@ def build(outcomes):
             if so is not None:
                 acc["dir_struck"].append(so)
                 if so > 0:
-                    sig["director_struck_off_max"].append(_sig(t, "director_struck_off_max", f"{int(so)} struck-off compan{'ies' if so != 1 else 'y'}", "Shut companies in this director's history.", src))
+                    sig["director_struck_off_max"].append(_sig(t, "director_struck_off_max", f"{int(so)} struck-off compan{'ies' if so != 1 else 'y'}", "Shut companies in this director's history.", src, val=so))
 
         elif k == "address_check":
             nb, rs = r.get("business_found") is False, bool(r.get("looks_residential"))
@@ -129,10 +129,10 @@ def build(outcomes):
             e = _num(r.get("employees_estimate"))
             if g is not None:
                 acc["growth"] = g
-                sig["growth_multiple"].append(_sig(t, "growth_multiple", f"Revenue up {g:g}x in a year", r.get("footprint_note") or "Reported growth from the DRHP.", src))
+                sig["growth_multiple"].append(_sig(t, "growth_multiple", f"Revenue up {g:g}x in a year", r.get("footprint_note") or "Reported growth from the DRHP.", src, val=g))
             if e is not None:
                 acc["emp"] = e
-                sig["log_employees"].append(_sig(t, "log_employees", f"About {int(e)} people work there", r.get("footprint_note") or "Estimated from LinkedIn and job portals.", src))
+                sig["log_employees"].append(_sig(t, "log_employees", f"About {int(e)} people work there", r.get("footprint_note") or "Estimated from LinkedIn and job portals.", src, val=e))
 
         elif k == "news_litigation":
             n = len(r.get("sebi_orders") or [])
@@ -150,7 +150,7 @@ def build(outcomes):
 
     # min/max features: only the claim that sets the value carries the signal
     def keep_extreme(feature, pick):
-        vals = [(float(''.join(ch for ch in x["title"].split()[1 if x["title"].startswith(("About", "Website")) else 0] if ch.isdigit() or ch == '.') or 0), x) for x in sig[feature]]
+        vals = [(x.get("val") if x.get("val") is not None else 0.0, x) for x in sig[feature]]
         if vals:
             sig[feature] = [pick(vals, key=lambda v: v[0])[1]]
     keep_extreme("vendor_min_employees", min)

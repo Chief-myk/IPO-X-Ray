@@ -1,0 +1,324 @@
+import React, { useState, useEffect, useRef } from 'react';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Methodology from './components/Methodology';
+import Cases from './components/Cases';
+import LiveInvestigation from './components/LiveInvestigation';
+import Report from './components/Report';
+import Footer from './components/Footer';
+
+const SEV_ORDER = ['critical', 'high', 'medium', 'low', 'unverified', 'clear'];
+
+export default function App() {
+  const [health, setHealth] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [investigation, setInvestigation] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  const eventSourceRef = useRef(null);
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(0);
+
+  // Fetch API Health on startup
+  useEffect(() => {
+    fetch('/api/health')
+      .then((r) => r.json())
+      .then((data) => setHealth(data))
+      .catch(() => setHealth({ live: false, sample: 'Kalindi Smart Mobility Limited', llm: false }));
+  }, []);
+
+  // Cleanup EventSource & timer on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) eventSourceRef.current.close();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const handleStartInvestigation = async ({ company, file, demo }) => {
+    if (eventSourceRef.current) eventSourceRef.current.close();
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    setIsSubmitting(true);
+
+    try {
+      const fd = new FormData();
+      fd.append('company', company);
+      fd.append('demo', demo ? 'true' : 'false');
+      if (file) fd.append('drhp', file);
+
+      const res = await fetch('/api/investigations', { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || 'Could not start the investigation.');
+      }
+
+      // Initialize Investigation State
+      startTimeRef.current = performance.now();
+      setElapsedTime(0);
+
+      const newInv = {
+        id: data.id,
+        company: data.company,
+        demo: data.demo,
+        phase: 'read',
+        phaseLabel: 'Reading the offer document…',
+        claims: [],
+        lanes: {},
+        score: 0,
+        flags: [],
+        report: null,
+        stats: { agents: 0, steps: 0 },
+      };
+
+      setInvestigation(newInv);
+
+      // Start Timer
+      timerRef.current = setInterval(() => {
+        setElapsedTime((performance.now() - startTimeRef.current) / 1000);
+      }, 100);
+
+      // Scroll smoothly to the live case section
+      setTimeout(() => {
+        document.getElementById('case')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+      // Connect to SSE Stream
+      const es = new EventSource(`/api/investigations/${data.id}/stream`);
+      eventSourceRef.current = es;
+
+      es.onmessage = (event) => {
+        try {
+          const ev = JSON.parse(event.data);
+          handleStreamEvent(ev);
+        } catch {
+          // Heartbeat / ping
+        }
+      };
+
+      es.addEventListener('end', () => {
+        es.close();
+        if (timerRef.current) clearInterval(timerRef.current);
+      });
+
+      es.onerror = () => {
+        if (es.readyState === EventSource.CLOSED) {
+          if (timerRef.current) clearInterval(timerRef.current);
+        }
+      };
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStreamEvent = (ev) => {
+    setInvestigation((prev) => {
+      if (!prev) return prev;
+
+      switch (ev.type) {
+        case 'phase':
+          return {
+            ...prev,
+            phase: ev.phase,
+            phaseLabel: ev.label,
+          };
+
+        case 'claims':
+          return {
+            ...prev,
+            claims: ev.claims.map((c) => ({
+              ...c,
+              worst: null,
+              open: 0,
+              state: 'pending',
+            })),
+          };
+
+        case 'agent_start': {
+          const a = ev.agent;
+          const newLanes = {
+            ...prev.lanes,
+            [a.id]: {
+              id: a.id,
+              claim_id: a.claim_id,
+              label: a.label,
+              target: a.target,
+              steps: [],
+              liveUrl: null,
+              sev: null,
+              topTitle: null,
+              elapsed: 0,
+              finished: false,
+              startTime: performance.now(),
+            },
+          };
+
+          const newClaims = prev.claims.map((c) => {
+            if (c.id === a.claim_id) {
+              return { ...c, open: (c.open || 0) + 1, state: 'checking' };
+            }
+            return c;
+          });
+
+          return {
+            ...prev,
+            lanes: newLanes,
+            claims: newClaims,
+            stats: { ...prev.stats, agents: prev.stats.agents + 1 },
+          };
+        }
+
+        case 'agent_step': {
+          const lane = prev.lanes[ev.id];
+          if (!lane) return prev;
+
+          const updatedLane = {
+            ...lane,
+            steps: [...lane.steps, { text: ev.text, error: !!ev.error }],
+            elapsed: Math.round((performance.now() - lane.startTime) / 1000),
+          };
+
+          return {
+            ...prev,
+            lanes: { ...prev.lanes, [ev.id]: updatedLane },
+            stats: { ...prev.stats, steps: prev.stats.steps + 1 },
+          };
+        }
+
+        case 'agent_live': {
+          const lane = prev.lanes[ev.id];
+          if (!lane) return prev;
+          return {
+            ...prev,
+            lanes: { ...prev.lanes, [ev.id]: { ...lane, liveUrl: ev.url } },
+          };
+        }
+
+        case 'agent_done': {
+          const lane = prev.lanes[ev.id];
+          if (!lane) return prev;
+
+          const findings = ev.findings || [];
+          const topFinding = findings[0] || null;
+          const sev = topFinding?.severity || 'clear';
+
+          const updatedLane = {
+            ...lane,
+            finished: true,
+            sev,
+            topTitle: topFinding?.title || '',
+            elapsed: Math.round((performance.now() - lane.startTime) / 1000),
+          };
+
+          const newClaims = prev.claims.map((c) => {
+            if (c.id === lane.claim_id) {
+              const newOpen = Math.max(0, (c.open || 1) - 1);
+              const curWorst = c.worst;
+              const newWorst =
+                curWorst === null || SEV_ORDER.indexOf(sev) < SEV_ORDER.indexOf(curWorst)
+                  ? sev
+                  : curWorst;
+              return {
+                ...c,
+                open: newOpen,
+                worst: newWorst,
+                state: newOpen <= 0 ? (newWorst || 'clear') : 'checking',
+              };
+            }
+            return c;
+          });
+
+          return {
+            ...prev,
+            lanes: { ...prev.lanes, [ev.id]: updatedLane },
+            claims: newClaims,
+          };
+        }
+
+        case 'score': {
+          return {
+            ...prev,
+            score: ev.score,
+            flags: ev.flags || [],
+          };
+        }
+
+        case 'report': {
+          // Scroll smoothly to the completed report section
+          setTimeout(() => {
+            document.getElementById('report')?.scrollIntoView({ behavior: 'smooth' });
+          }, 300);
+
+          return {
+            ...prev,
+            phase: 'report',
+            phaseLabel: `Completed in ${ev.report?.elapsed}s.`,
+            report: ev.report,
+          };
+        }
+
+        case 'error': {
+          return {
+            ...prev,
+            phaseLabel: `Stopped: ${ev.message}`,
+          };
+        }
+
+        default:
+          return prev;
+      }
+    });
+  };
+
+  const handleReset = () => {
+    document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      document.getElementById('company')?.focus();
+    }, 400);
+  };
+
+  return (
+    <div className="min-h-screen bg-film text-bone font-sans selection:bg-beam/30 selection:text-bone">
+      {/* Navigation */}
+      <Navbar health={health} />
+
+      {/* Main Content */}
+      <main>
+        {/* Hero with Scanner & DRHP Form */}
+        <Hero
+          onStart={handleStartInvestigation}
+          isLive={health?.live}
+          isSubmitting={isSubmitting}
+        />
+
+        {/* Methodology: One agent per claim */}
+        <Methodology />
+
+        {/* Real-world SME IPO Case Studies */}
+        <Cases />
+
+        {/* Live Investigation Monitor */}
+        {investigation && (
+          <LiveInvestigation
+            investigation={investigation}
+            elapsedTime={elapsedTime}
+          />
+        )}
+
+        {/* Final Risk Report */}
+        {investigation?.report && (
+          <Report
+            report={investigation.report}
+            onReset={handleReset}
+          />
+        )}
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}

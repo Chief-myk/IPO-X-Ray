@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -17,9 +18,37 @@ from ml.model import get_model, reload_model
 from pipeline import Investigation, run_investigation
 
 FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
+DIST = FRONTEND / "dist"
+STATIC_DIR = DIST if DIST.exists() else FRONTEND
+
 app = FastAPI(title="IPO X-Ray")
 RUNS: dict[str, Investigation] = {}
 BACKGROUND: set[asyncio.Task] = set()
+
+MAX_RUNS = 100
+RUN_TTL_SECONDS = 3600  # 1 hour
+
+
+def _cleanup_runs():
+    """Purge completed runs older than RUN_TTL_SECONDS and enforce MAX_RUNS capacity limit."""
+    now = time.time()
+    # 1. Purge expired runs
+    expired = [
+        rid for rid, inv in RUNS.items()
+        if (now - getattr(inv, "started", now)) > RUN_TTL_SECONDS and getattr(inv, "done", True)
+    ]
+    for rid in expired:
+        RUNS.pop(rid, None)
+
+    # 2. If still over MAX_RUNS, evict the oldest completed runs
+    if len(RUNS) > MAX_RUNS:
+        completed = sorted(
+            [inv for inv in RUNS.values() if getattr(inv, "done", True)],
+            key=lambda x: getattr(x, "started", 0)
+        )
+        excess = len(RUNS) - MAX_RUNS
+        for inv in completed[:excess]:
+            RUNS.pop(inv.id, None)
 
 
 @app.on_event("startup")
@@ -55,6 +84,7 @@ async def create(company: str = Form(""), demo_mode: bool = Form(False, alias="d
             raise HTTPException(400, "The DRHP must be a PDF file.")
         if len(pdf) > 60 * 1024 * 1024:
             raise HTTPException(400, "That PDF is over 60 MB. Upload the business and management chapters only.")
+    _cleanup_runs()
     inv = Investigation(company, demo_mode)
     RUNS[inv.id] = inv
     t = asyncio.create_task(run_investigation(inv, pdf))
@@ -91,7 +121,10 @@ def snapshot(run_id: str):
 
 @app.get("/")
 def index():
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
     return FileResponse(FRONTEND / "index.html")
 
 
-app.mount("/", StaticFiles(directory=FRONTEND), name="static")
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
