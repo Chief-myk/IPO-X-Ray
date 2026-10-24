@@ -113,6 +113,12 @@ async def run_investigation(inv: Investigation, pdf: bytes | None):
         report = build_report(inv.company, claims, inv.outcomes, feats, pred, flags, demo=inv.demo)
         report["summary"] = demo.SUMMARY if inv.demo else await summarise(report)
         report["elapsed"] = round(time.time() - inv.started, 1)
+        report["id"] = inv.id
+        try:
+            import database
+            await asyncio.to_thread(database.save_investigation, report)
+        except Exception as e:
+            print(f"Error saving to database: {e}")
         await inv.emit("report", report=report)
     except Exception as exc:  # surface any failure to the UI instead of hanging
         await inv.emit("error", message=f"{exc.__class__.__name__}: {exc}")

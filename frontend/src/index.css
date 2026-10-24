@@ -53,8 +53,11 @@ body {
   background-color: var(--film);
   color: var(--bone);
   font-family: var(--sans);
-  background-image: radial-gradient(120% 70% at 75% 0%, #183049 0%, transparent 60%);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(31, 56, 81, 0.45) 0%, transparent 55%),
+    radial-gradient(120% 70% at 75% 0%, #183049 0%, transparent 60%);
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 /* Severity Color Bindings */
@@ -67,7 +70,8 @@ body {
 
 /* Animation Keyframes */
 @keyframes sweep {
-  to { transform: translateX(100%); }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 @keyframes flash {
@@ -76,12 +80,28 @@ body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.92); }
+}
+
+@keyframes beamSweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes borderRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animate-sweep {
-  animation: sweep 1.6s linear infinite;
+  animation: sweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .animate-flash {
@@ -89,7 +109,50 @@ body {
 }
 
 .animate-pulseGlow {
-  animation: pulseGlow 1.2s infinite;
+  animation: pulseGlow 1.6s ease-in-out infinite;
+}
+
+.animate-radar {
+  animation: radarSpin 4s linear infinite;
+}
+
+/* Glassmorphism & Depth Utilities */
+.glass-panel {
+  background: rgba(21, 40, 58, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(39, 67, 94, 0.65);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(21, 40, 58, 0.75) 0%, rgba(15, 30, 43, 0.85) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(39, 67, 94, 0.6);
+  box-shadow: 0 16px 36px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  border-color: rgba(127, 216, 232, 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.75), 0 0 25px -6px rgba(127, 216, 232, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Fintech dot and grid backdrops */
+.bg-grid-fintech {
+  background-image: 
+    linear-gradient(to right, rgba(230, 237, 242, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(230, 237, 242, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-dots-fintech {
+  background-image: radial-gradient(rgba(127, 216, 232, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Custom scrollbars */
@@ -106,4 +169,22 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--bone-dim);
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
 }

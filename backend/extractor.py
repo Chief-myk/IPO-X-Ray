@@ -34,7 +34,7 @@ def _gemini_generate(prompt: str) -> str | None:
     try:
         from google import genai
         client = genai.Client(api_key=key)
-        model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         response = client.models.generate_content(model=model, contents=prompt)
         return response.text
     except Exception as exc:

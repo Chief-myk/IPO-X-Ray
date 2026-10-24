@@ -5,6 +5,7 @@ import os
 import re
 import time
 from pathlib import Path
+from pydantic import BaseModel, Field
 
 from dotenv import load_dotenv
 
@@ -34,7 +35,7 @@ DIST = FRONTEND / "dist"
 LEGACY = FRONTEND / "legacy"  # plain-HTML UI, served only when the React app hasn't been built
 STATIC_DIR = DIST if DIST.exists() else LEGACY
 
-app = FastAPI(title="IPO X-Ray")
+app = FastAPI(title="IPO X-Ray 360", version="2.0.0")
 RUNS: dict[str, Investigation] = {}
 BACKGROUND: set[asyncio.Task] = set()
 
@@ -45,7 +46,6 @@ RUN_TTL_SECONDS = 3600  # 1 hour
 def _cleanup_runs():
     """Purge completed runs older than RUN_TTL_SECONDS and enforce MAX_RUNS capacity limit."""
     now = time.time()
-    # 1. Purge expired runs
     expired = [
         rid for rid, inv in RUNS.items()
         if (now - getattr(inv, "started", now)) > RUN_TTL_SECONDS and getattr(inv, "done", True)
@@ -53,7 +53,6 @@ def _cleanup_runs():
     for rid in expired:
         RUNS.pop(rid, None)
 
-    # 2. If still over MAX_RUNS, evict the oldest completed runs
     if len(RUNS) > MAX_RUNS:
         completed = sorted(
             [inv for inv in RUNS.values() if getattr(inv, "done", True)],
@@ -65,21 +64,200 @@ def _cleanup_runs():
 
 
 @app.on_event("startup")
-async def warm_model():
-    await asyncio.to_thread(get_model)   # trains on first run if no model file exists
+async def startup_event():
+    database.init_db()
+    await asyncio.to_thread(get_model)
 
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "live": tinyfish.is_live(), "llm": bool(os.getenv("GEMINI_API_KEY")),
-            "sample": demo.COMPANY, "model": get_model().meta}
+    return {
+        "ok": True,
+        "live": tinyfish.is_live(),
+        "llm": bool(os.getenv("GEMINI_API_KEY")),
+        "sample": demo.COMPANY,
+        "model": get_model().meta,
+        "features": {
+            "agent_debate": True,
+            "decision_simulator": True,
+            "promise_tracker": True,
+            "rag_chatbot": True
+        }
+    }
 
 
 @app.post("/api/model/reload")
 async def model_reload():
-    """Call after `python -m ml.train` to pick up a retrained model without restarting."""
     return (await asyncio.to_thread(reload_model)).meta
 
+
+# --- Feature 1: Agent Debate (Bull vs Bear) ---
+
+class DebateRequest(BaseModel):
+    company: str = Field(default=demo.COMPANY)
+    investigation_id: str | None = None
+
+
+@app.post("/api/debate")
+async def create_debate(req: DebateRequest):
+    comp = req.company.strip() or demo.COMPANY
+    result = await debate.generate_debate(comp, req.investigation_id)
+    return result
+
+
+@app.get("/api/debate")
+def get_debate(company: str = Query(default=demo.COMPANY)):
+    deb = database.get_latest_debate(company)
+    if not deb:
+        # Fallback or generate on the fly
+        return None
+    return deb
+
+
+# --- Feature 2: Investment Decision Simulator ---
+
+class SimulatorRequest(BaseModel):
+    company: str = Field(default=demo.COMPANY)
+    investment_amount: float = Field(default=15000.0, ge=100)
+    horizon_months: int = Field(default=12, ge=0)
+    risk_score: float | None = None
+
+
+@app.post("/api/simulator/calculate")
+def calculate_simulation(req: SimulatorRequest):
+    comp = req.company.strip() or demo.COMPANY
+    result = simulator.calculate_simulation(
+        comp,
+        req.investment_amount,
+        req.horizon_months,
+        req.risk_score
+    )
+    return result
+
+
+@app.get("/api/simulator")
+def get_simulation(company: str = Query(default=demo.COMPANY)):
+    sim = database.get_latest_simulation(company)
+    if not sim:
+        # Generate default
+        sim = simulator.calculate_simulation(company, 15000.0, 12)
+    return sim
+
+
+# --- Feature 3: AI Financial Chatbot ---
+
+class ChatRequest(BaseModel):
+    message: str
+    session_id: str | None = None
+    company: str | None = None
+    investigation_id: str | None = None
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    if not req.message.strip():
+        raise HTTPException(400, "Message cannot be empty.")
+    resp = await rag_chatbot.chat_with_copilot(
+        session_id=req.session_id,
+        message=req.message.strip(),
+        company=req.company,
+        investigation_id=req.investigation_id
+    )
+    return resp
+
+
+@app.get("/api/chat/history/{session_id}")
+def chat_history(session_id: str):
+    return {"session_id": session_id, "messages": database.get_chat_history(session_id)}
+
+
+@app.delete("/api/chat/history/{session_id}")
+def clear_chat(session_id: str):
+    database.clear_chat_history(session_id)
+    return {"ok": True, "message": "Session history cleared."}
+
+
+# --- Feature 4: IPO Promise Tracker ---
+
+class PromiseExtractRequest(BaseModel):
+    company: str
+    text: str
+
+
+class PromiseVerifyRequest(BaseModel):
+    promise_id: str
+    disclosure_text: str
+    disclosure_source: str
+
+
+class PromiseUpdateRequest(BaseModel):
+    status: str
+    evidence_quote: str = ""
+    evidence_source: str = ""
+    alert_severity: str = "none"
+    alert_message: str = ""
+
+
+@app.get("/api/promises")
+def list_promises(
+    company: str | None = None,
+    status: str | None = None,
+    category: str | None = None
+):
+    promises = promise_tracker.get_all_promises(company=company, status=status, category=category)
+    return {"promises": promises, "total": len(promises)}
+
+
+@app.get("/api/promises/alerts")
+def promise_alerts(company: str | None = None):
+    alerts = promise_tracker.get_active_alerts(company=company)
+    return {"alerts": alerts, "count": len(alerts)}
+
+
+@app.post("/api/promises/extract")
+async def extract_promises(req: PromiseExtractRequest):
+    if not req.company.strip() or not req.text.strip():
+        raise HTTPException(400, "Company name and prospectus text are required.")
+    extracted = await promise_tracker.extract_promises_from_prospectus(req.company.strip(), req.text)
+    return {"company": req.company, "commitments": extracted, "count": len(extracted)}
+
+
+@app.post("/api/promises/verify")
+async def verify_promise(req: PromiseVerifyRequest):
+    if not req.promise_id or not req.disclosure_text.strip():
+        raise HTTPException(400, "Promise ID and disclosure text are required.")
+    try:
+        updated = await promise_tracker.verify_commitment(
+            req.promise_id,
+            req.disclosure_text,
+            req.disclosure_source
+        )
+        return updated
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.put("/api/promises/{promise_id}")
+def update_promise_manual(promise_id: str, req: PromiseUpdateRequest):
+    conn = database.get_connection()
+    row = conn.execute("SELECT * FROM promises WHERE id = ?", (promise_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(404, "Promise not found.")
+    
+    p = dict(row)
+    p["status"] = req.status
+    if req.evidence_quote:
+        p["evidence_quote"] = req.evidence_quote
+    if req.evidence_source:
+        p["evidence_source"] = req.evidence_source
+    p["alert_severity"] = req.alert_severity
+    p["alert_message"] = req.alert_message
+    database.save_promise(p)
+    return p
+
+
+# --- Existing Investigation Endpoints ---
 
 @app.post("/api/investigations")
 async def create(company: str = Form(""), demo_mode: bool = Form(False, alias="demo"), drhp: UploadFile | None = File(None)):

@@ -8,6 +8,10 @@ import XRay from './components/xray/XRay';
 import Shield from './components/xray/Shield';
 import Report from './components/Report';
 import Footer from './components/Footer';
+import AgentDebate from './components/AgentDebate';
+import InvestmentSimulator from './components/InvestmentSimulator';
+import PromiseTracker from './components/PromiseTracker';
+import FinancialChatbot from './components/FinancialChatbot';
 
 const SEV_ORDER = ['critical', 'high', 'medium', 'low', 'unverified', 'clear'];
 
@@ -321,7 +325,30 @@ export default function App() {
             onReset={handleReset}
           />
         )}
+
+        {/* 1. Agent Debate (Bull vs Bear) */}
+        <AgentDebate 
+          currentCompany={investigation?.company} 
+          investigationId={investigation?.id} 
+        />
+
+        {/* 2. Investment Decision Simulator */}
+        <InvestmentSimulator 
+          currentCompany={investigation?.company} 
+          riskScore={investigation?.score} 
+        />
+
+        {/* 4. IPO Promise Tracker */}
+        <PromiseTracker 
+          currentCompany={investigation?.company} 
+        />
       </main>
+
+      {/* 3. AI Financial Chatbot (Context-aware RAG drawer) */}
+      <FinancialChatbot 
+        currentCompany={investigation?.company} 
+        investigationId={investigation?.id} 
+      />
 
       {/* Footer */}
       <Footer />
