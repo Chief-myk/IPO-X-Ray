@@ -17,7 +17,7 @@
 
 ---
 
-[🌐 Live Hosted App](https://ipo-xray-360.vercel.app) • [🎬 Watch 3-Min Video Demo](https://youtu.be/your-demo-video) • [💼 Read LinkedIn Announcement](https://linkedin.com/in/your-profile) • [📑 Documentation](#-multi-agent-forensic-architecture)
+[🌐 Live Hosted App](https://ipo-x-ray.vercel.app) • [🎬 Watch 3-Min Video Demo](https://youtu.be/your-demo-video) • [💼 Read LinkedIn Announcement](https://linkedin.com/in/your-profile) • [📑 Documentation](#-multi-agent-forensic-architecture)
 
 ---
 
