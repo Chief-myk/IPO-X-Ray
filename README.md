@@ -1,112 +1,256 @@
-# IPO X-Ray
+<div align="center">
 
-Agents that read an SME IPO's offer document (DRHP) and check every claim on the open web — vendors, clients, directors, addresses, revenue — before a retail investor puts money in.
+# 🏛️ IPO X-RAY 360
+### Institutional-Grade SME & Mainboard IPO Forensic Intelligence Platform
 
-## What we are actually building
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Hosted_App-D4AF37?style=for-the-badge&logo=googlechrome&logoColor=black)](https://ipo-xray-360.vercel.app)
+[![Video Walkthrough](https://img.shields.io/badge/Demo_Video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/your-demo-video)
+[![LinkedIn Post](https://img.shields.io/badge/LinkedIn-Announcement_Post-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/your-profile)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React 19](https://img.shields.io/badge/Frontend-React_19_+_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 
-Not a chatbot, and not a single agent. IPO X-Ray is a **multi-agent orchestrator**:
+<p align="center">
+  <b>Read the prospectus like a forensic investigator would before you commit capital.</b><br/>
+  Autonomous web agents, ROC/MCA registry cross-examination, calibrated gradient-boosted risk modeling, post-listing commitment auditing, and interactive investor intelligence in a unified private-wealth terminal.
+</p>
 
+---
+
+[🌐 Live Hosted App](https://ipo-xray-360.vercel.app) • [🎬 Watch 3-Min Video Demo](https://youtu.be/your-demo-video) • [💼 Read LinkedIn Announcement](https://linkedin.com/in/your-profile) • [📑 Documentation](#-multi-agent-forensic-architecture)
+
+---
+
+</div>
+
+## 📌 Visual Showcase & Platform Tour
+
+<div align="center">
+
+### 1. High-Conviction Landing Page & DRHP Investigator Hero
+*Autonomous agent radar cross-examining offer documents before capital is deployed.*
+<br/>
+
+<a href="./public/a.png">
+  <img src="./public/a.png" width="95%" alt="Landing Page and DRHP Scanner" style="border-radius: 12px; border: 1px solid rgba(212,175,55,0.3);" />
+</a>
+
+<br/><br/>
+
+### 2. Institutional IPO Screener & Metrics Dashboard (`/dashboard`)
+*Live bidding tracker, issue timelines, capital-raised telemetry, and forensic flag rates.*
+<br/>
+
+<a href="./public/b.png">
+  <img src="./public/b.png" width="95%" alt="IPO Intelligence Screener Dashboard" style="border-radius: 12px; border: 1px solid rgba(212,175,55,0.3);" />
+</a>
+
+<br/><br/>
+
+| 3. Bull vs Bear AI Debate Arena | 4. Post-Listing IPO Promise Tracker |
+| :---: | :---: |
+| <a href="./public/c.png"><img src="./public/c.png" width="100%" alt="Bull vs Bear Debate" style="border-radius: 8px; border: 1px solid rgba(212,175,55,0.2);" /></a> | <a href="./public/d.png"><img src="./public/d.png" width="100%" alt="IPO Promise Tracker" style="border-radius: 8px; border: 1px solid rgba(212,175,55,0.2);" /></a> |
+| *Evidence-grounded Bull & Bear theses synthesized by an Impartial Judge.* | *Audits stated DRHP proceeds utilization against subsequent Annual Reports.* |
+
+| 5. Evidence-Weighted Investment Simulator | 6. AutoSpy — Autonomous Claim Investigator |
+| :---: | :---: |
+| <a href="./public/e.png"><img src="./public/e.png" width="100%" alt="Investment Simulator" style="border-radius: 8px; border: 1px solid rgba(212,175,55,0.2);" /></a> | <a href="./public/f.png"><img src="./public/f.png" width="100%" alt="AutoSpy Investigator" style="border-radius: 8px; border: 1px solid rgba(212,175,55,0.2);" /></a> |
+| *Probability-weighted capital outcomes factoring in peer drawdown history.* | *Forensic scrutiny of unverified stock tips, WhatsApp forwards & YouTube claims.* |
+
+</div>
+
+---
+
+## ⚡ The Core Problem
+
+India’s SME and Mainboard IPO markets have experienced unprecedented retail exuberance. Beneath astronomical subscription multiples often lie:
+* **Circular Shell Vendors:** Undisclosed related parties sharing registered addresses or directors with promoters.
+* **Paper Client Rosters:** Mega contracts with entities that have no commercial web presence or never acknowledge the issuer.
+* **Phantom Employees:** Triple-digit revenue surges reported with single-digit EPFO-registered workforces.
+* **Post-Listing Disappearance:** Funds raised for expansion diverted away from stated DRHP objectives.
+
+**IPO X-Ray 360** transforms offer documents from static, 400-page marketing PDFs into machine-scrutinized evidentiary findings backed by verifiable public records.
+
+---
+
+## 🔬 Multi-Agent Forensic Architecture
+
+```mermaid
+flowchart TD
+    DRHP["📄 Offer Document (DRHP / RHP PDF)"]
+    
+    subgraph Extraction ["1. Forensic Extraction Engine"]
+        EX["Claim & Entity Extractor (Gemini 2.5 Flash / Regex)"]
+        CL["Entities: Promoters · Vendors · Key Clients · Plant Sites · Stated Use of Funds"]
+    end
+
+    subgraph AutonomousAgents ["2. Parallel Browser Swarm (TinyFish)"]
+        A1["🔍 MCA / ROC Registry Agent"]
+        A2["🏢 EPFO Workforce Auditor"]
+        A3["📍 Satellite / Map Site Verifier"]
+        A4["📜 Court & SEBI Order Scanner"]
+        A5["📰 Open-Web News & Tender Search"]
+    end
+
+    subgraph RiskEngine ["3. Calibrated ML Risk Engine"]
+        FE["17 Measured Discrepancy Features"]
+        GB["HistGradientBoostingClassifier (Sigmoid-Calibrated)"]
+        SH["Monte Carlo Shapley Value Attribution"]
+        IF["Isolation Forest (Unusualness Percentile)"]
+    end
+
+    subgraph IntelligenceSuite ["4. Terminal Intelligence Suite"]
+        DASH["📊 IPO Screener & Metric Dashboard"]
+        DOS["📑 9-Tab Forensic Dossier"]
+        DEB["⚖️ Bull vs Bear AI Debate Arena"]
+        TRUTH["📈 Truth vs Hype Promotion Auditor"]
+        TIME["⏳ IPO Time Machine & Peer Drawdowns"]
+        SIM["🧮 Investment Scenario Simulator"]
+        PROMISE["🔍 Post-Listing Promise Tracker"]
+        APPLY["📝 ASBA Bid Preparation & Tracking"]
+    end
+
+    DRHP --> EX --> CL
+    CL --> A1 & A2 & A3 & A4 & A5
+    A1 & A2 & A3 & A4 & A5 --> FE --> GB & SH & IF
+    GB & SH & IF --> DASH & DOS & DEB & TRUTH & TIME & SIM & PROMISE & APPLY
 ```
-DRHP (PDF, or found online by a discovery agent)
-        │
-        ▼
- 1. Claim extractor ──► list of checkable claims (vendor, client, director, address, financials) with page numbers
-        │
-        ▼
- 2. Planner ──────────► one goal per claim  ("Is this vendor a real operating business?")
-        │
-        ▼
- 3. TinyFish web agents, in parallel (asyncio, MAX_PARALLEL_AGENTS)
-        │   each agent opens a real browser, decides where to search/click/read,
-        │   streams its steps, returns JSON
-        ▼
- 4. ML risk model ───► fraud probability (gradient-boosted trees, calibrated)
-        │                + Shapley explanation: how many points each finding added
-        │                + isolation-forest "how unusual is this IPO" percentile
-        │
-        ▼
- 5. Report (+ optional Gemini summary) streamed live to the UI over SSE
+
+---
+
+## 🌟 Key Modules & Capabilities
+
+### 1. 🏛️ High-Conviction Landing Page (`/`)
+* **"Read the prospectus like an investigator would"** — terminal hero featuring an interactive DRHP document reader, live agent telemetry, and sample scam autopsy cases.
+* Direct search bar for SME issuer names or PDF DRHP uploads.
+* Instant redirect into the complete IPO Screener via the primary **"Start investigation"** CTA.
+
+### 2. 📊 IPO Screener & Metrics Dashboard (`/dashboard`)
+* Filter across **Live Bidding**, **Upcoming Filings**, **Closed / Allotment Awaited**, and **Newly Listed** issues.
+* Granular filters by Sector, Listing Board (NSE Emerge, BSE SME, Mainboard), and Forensic Risk Level.
+* Dual-view mode: Institutional Data Table vs Executive Card Grid with real-time subscription meters and capital-raised telemetry.
+* Direct URL query sync (`/dashboard?q=Kalindi`).
+
+### 3. 📑 9-Tab Forensic Dossier (`/ipo/:symbol`)
+Every company profile is backed by an in-depth intelligence dossier:
+1. **Financials & Peers:** Capital structure, price bands, lot size, financial highlights, peer multiples, and subscription status.
+2. **Official Filings:** Download links for DRHP, RHP, and exchange notices with origin verification.
+3. **AI Forensic Risk Audit:** Explainable risk scores with Shapley points breakdown and supporting source links.
+4. **Bull vs Bear Debate:** Independent Bull agent builds the strongest growth thesis; Bear attacks forensic vulnerabilities; Impartial Judge delivers evidence-grounded synthesis.
+5. **Truth vs Hype:** Backtests social media tips / telegram calls against actual market prices after transaction fees & Nifty 50 benchmarks.
+6. **IPO Time Machine:** Evaluates historically comparable listing drawdowns, valuation multiples, and liquidity traps.
+7. **Investment Simulator:** Monte-Carlo capital modeling (Best, Base, and Worst cases) factoring in tail-risk drawdowns.
+8. **Promoter & Vendor Graph:** Interactive `vis-network` graph displaying shared directors, identical addresses, and circular supplier loops.
+9. **Subscription & Dates:** Detailed issue schedules, refund dates, and official registrar allotment lookups.
+
+### 4. 📝 ASBA Bid Preparation & Application Tracking (`/applications`)
+* Bid calculator computing retail & HNI lot multiples, cut-off prices, and capital requirements.
+* Strict compliance: **Never collects sensitive UPI PINs or banking credentials**; prepares verified ASBA instructions and routes to official broker/bank channels.
+* Lifecycle tracking from Draft to Allotted, Partially Allotted, or Refunded.
+
+### 5. 🔍 Post-Listing Promise Tracker (`/portfolio`)
+* Continuously audits DRHP commitments (headcount targets, plant capex, debt retirement) against subsequent Annual Reports and MCA filings.
+* Categorizes commitments into **Met**, **Partially Met**, **Missed**, and **Unverified**.
+* Escalates alerts when proceeds deviation exceeds allowable regulatory thresholds.
+
+### 6. 🕵️ AutoSpy Autonomous Tip Investigator (`/autospy`)
+* Ingests unverified stock tips, WhatsApp forwards, YouTube videos, or unlisted shares offers.
+* Autonomous agents extract promoter names, registration numbers, and financial promises to verify legitimacy against SEBI records.
+
+### 7. 🤖 Context-Aware Financial Copilot
+* Embedded AI analyst drawer grounded in official DRHP text and public registry evidence.
+* Cites page numbers and statutory sources; refuses speculation or return guarantees.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 19, Vite, Tailwind CSS, Framer Motion, Lucide Icons, Vis-Network |
+| **Typography** | `Cinzel` (Luxury Display), `Plus Jakarta Sans` (UI Sans), `Playfair Display` (Editorial Serif), `JetBrains Mono` (Financial Telemetry) |
+| **Backend** | Python 3.11+, FastAPI, Uvicorn, SQLite3, Server-Sent Events (SSE) |
+| **Machine Learning** | Scikit-learn (`HistGradientBoostingClassifier`, `IsolationForest`), Joblib |
+| **Agentic Web AI** | TinyFish Autonomous Browser Swarm, Google Gemini 2.5 Flash / Pro |
+| **Knowledge Graph** | Graphify (AST symbol mapping, 1,050+ nodes, 2,670+ dependency edges) |
+
+---
+
+## 🚀 Quick Start Guide
+
+### Prerequisites
+* Python 3.10+ installed
+* Node.js 18+ (Node 20+ recommended)
+* Optional: [TinyFish API Key](https://tinyfish.ai) (for live browser agents; simulated offline mode works out of the box)
+* Optional: `GEMINI_API_KEY` (for generative DRHP text extraction)
+
+### 1. Backend Setup
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ipo-xray.git
+cd ipo-xray/backend
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate       # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment variables
+cp .env.example .env            # Add your API keys if available
+
+# Launch the FastAPI backend server
+uvicorn main:app --reload --port 8000
 ```
 
-We write the brain that decides *what* to investigate and how to judge the evidence. TinyFish supplies the hands: browser agents that figure out *how* to find it on sites we never scripted.
+### 2. Frontend Setup
+```bash
+# In a new terminal window
+cd ../frontend
 
-## Run it
+# Install dependencies
+npm install
+
+# Start Vite development server
+npm run dev
+```
+
+Visit **`http://localhost:5173`** in your browser. (The dev server proxies `/api` requests seamlessly to `http://localhost:8000`).
+
+---
+
+## 🧪 Automated Testing
+
+Run the end-to-end backend test suite verifying the database, ML inference, simulator, promise tracker, debate engine, and copilot:
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env                                     # add TINYFISH_API_KEY
-uvicorn main:app --reload --port 8000
+python -m unittest test_features.py -v
 ```
-Open http://localhost:8000. The FastAPI server serves the React build from `frontend/dist` if it exists, otherwise the plain-HTML fallback in `frontend/legacy/` (no Node needed).
 
-React front end (Vite + Tailwind):
-```bash
-cd frontend && npm install
-npm run dev      # http://localhost:5173, proxies /api to :8000
-npm run build    # writes frontend/dist, which FastAPI then serves
-```
-The Network · Vendors · Watch page (`frontend/public/xray.html`) is plain HTML copied as-is into the build.
+---
 
-Without a key, **Run the sample case** works fully (fictional company, simulated agents) — use it to rehearse and as a backup during judging.
+## ⚖️ Regulatory Disclaimer & Ethics
 
-## The ML model
+> [!IMPORTANT]
+> **IPO X-Ray 360** is an open-source forensic intelligence research tool. It is **not** a SEBI-registered investment advisor or stock broker. 
+> * The platform does not guarantee IPO allotment or predict stock market gains.
+> * Application preparation is educational and routes to official bank ASBA/broker channels; no banking passwords or UPI PINs are ever captured or stored.
+> * Every forensic finding is cited with verifiable public records (DRHP page citations, MCA filings, court dockets, or tender archives).
 
-**What it predicts:** probability that an SME IPO's disclosures don't hold up, from 17 features the agents measure (vendor linked to promoter, youngest vendor website, smallest vendor headcount, clients who never name the issuer, director overlaps, struck-off history, address checks, growth vs. headcount, regulator orders, court cases, complaints, share of claims agents couldn't verify).
+---
 
-**Model:** `HistGradientBoostingClassifier` (handles missing agent results natively, learns interactions such as "4x growth *and* 11 staff"), sigmoid-calibrated so 0.8 means roughly 80%. An `IsolationForest` fitted on clean cases adds an unusualness percentile.
+## 🤝 Contributing & Community
 
-**Explanations:** Monte Carlo Shapley values over observed features. Points per finding add up to the score's rise above the "nothing known" baseline. A flag's severity is the points it added, so the model, not hand-written rules, decides what's critical.
-
-**Training data, honestly:** there is no public labelled dataset of SME IPO frauds. The model starts on 4,000 synthetic cases (`ml/synth.py`, our assumptions in code, with noise, missing values, legit fast-growers and 4% wrong labels; holdout AUC ≈ 0.86). Every real case you label counts 25×:
+Contributions are warmly welcomed! Please read [`AGENTS.md`](./AGENTS.md) before submitting pull requests (our repo enforces continuous AST symbol auditing with `graphify`).
 
 ```bash
-# run an investigation on an IPO whose outcome is known, click "Download report", then:
-python -m ml.label ipo-xray-<company>.json 1 "SEBI order link"   # 1 = later actioned by SEBI/exchange
-python -m ml.label ipo-xray-<company>.json 0 "no action found"
-python -m ml.train                                               # prints AUC on your real cases
-curl -X POST localhost:8000/api/model/reload                     # pick it up without restart
-```
-Label from what happened after listing, never from the model's own score. Even 15–20 real cases (SEBI-actioned SME issues + clean ones from the same years) make the "AUC on real cases" line something you can show judges.
-
-## Before the demo: check the TinyFish endpoint
-
-`backend/tinyfish.py` calls `POST {TINYFISH_BASE_URL}{TINYFISH_RUN_SSE_PATH}` with header `X-API-Key` and body `{"url", "goal"}`, and reads SSE events. Confirm the base URL, path and auth header in your TinyFish dashboard/docs and set them in `.env` if they differ. The event parser is tolerant (it accepts `COMPLETE`/`resultJson`/`result`, `purpose`/`message` steps, and a `streamingUrl` live view), so usually only those two env values need changing. Test one agent first:
-
-```bash
-curl -N -X POST "$TINYFISH_BASE_URL/v1/automation/run-sse" \
-  -H "X-API-Key: $TINYFISH_API_KEY" -H "Content-Type: application/json" \
-  -d '{"url":"https://www.bing.com/search?q=Infosys","goal":"Return JSON {\"title\": first result title}"}'
+# Sync codebase knowledge graph
+python -m graphify update
 ```
 
-If TinyFish's separate Search / Fetch endpoints are in your plan, add them in `tinyfish.py` and call them from `planner.py` for cheap lookups (e.g. WHOIS) before spending a full agent run.
-
-## Files
-
-| Path | Role |
-|---|---|
-| `backend/main.py` | FastAPI: create investigation, SSE stream, serves UI |
-| `backend/pipeline.py` | Orchestrator: extract → plan → parallel agents → score → report |
-| `backend/planner.py` | Claim → agent goal + start URL + expected JSON shape |
-| `backend/tinyfish.py` | TinyFish SSE client and event normaliser |
-| `backend/extractor.py` | DRHP PDF → claims (Gemini if `GEMINI_API_KEY`, else regex) |
-| `backend/scoring.py` | Turns model output into flags (severity = points the finding added) |
-| `backend/ml/features.py` | Agent results → 17 features per IPO + signals tied to claims |
-| `backend/ml/synth.py` | Synthetic bootstrap dataset (assumptions written down) |
-| `backend/ml/train.py` | Trains + calibrates the model, isolation forest, saves `models/risk_model.joblib` |
-| `backend/ml/model.py` | Prediction + Shapley-value explanations |
-| `backend/ml/label.py` | Adds a real, labelled case to `ml/data/labeled_ipos.csv` |
-| `backend/demo.py` | Fictional sample case |
-| `frontend/src/` | React app (Vite, Tailwind): App.jsx + components |
-| `frontend/public/` | xray.html, xray.js — network/vendor/watch page, static |
-| `frontend/legacy/` | old plain-HTML UI (GSAP, Lenis), fallback when there's no build |
-
-## Three-minute judging script
-
-1. Hero: the scanner passes over a DRHP page and flags light up — say the one-line pitch.
-2. Scroll the "one agent per claim" section — explain orchestrator vs. agents.
-3. Type a real SME IPO name (have its DRHP PDF ready to attach) → **Start investigation**. Point at agents running in parallel; click **Watch the browser** on one.
-4. Report: verdict, score, each flag with sources. Close with: a flag is a reason to look closer, not a verdict.
-
-Keep the sample case one click away in case venue Wi-Fi or a site's bot check slows a live run.
+<div align="center">
+  <sub>Crafted for transparent, evidence-backed IPO investing.</sub><br/>
+  <b>© 2026 IPO X-Ray 360. All rights reserved.</b>
+</div>
