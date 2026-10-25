@@ -1,190 +1,268 @@
 @import "tailwindcss";
 
 @theme {
-  --color-film: #0F1E2B;
-  --color-film-2: #15283A;
-  --color-film-3: #1F3851;
-  --color-line: #27435E;
-  --color-bone: #E6EDF2;
-  --color-bone-dim: #9FB2C2;
-  --color-beam: #7FD8E8;
-  --color-paper: #EEF0EA;
-  --color-ink: #1B2430;
-  --color-ink-dim: #5A6573;
-  --color-critical: #FF5A4E;
-  --color-high: #FF8A3D;
-  --color-medium: #FFC23D;
-  --color-low: #C9D46A;
-  --color-clear: #8FE0AE;
-  --color-unverified: #8EA3B5;
+  /* ── Pure Black & Gold Luxury Palette ── */
+  --color-obsidian:   #000000;      /* Pure AMOLED true black */
+  --color-obsidian-2: #080808;      /* Primary card surface */
+  --color-obsidian-3: #111111;      /* Elevated dropdowns & popovers */
+  --color-obsidian-4: #181818;      /* Hover states & active chips */
 
-  --font-sans: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --color-charcoal:   #1C1C1C;      /* Fine dividers */
+  --color-charcoal-2: #282828;      /* Subtle border */
+  --color-charcoal-3: #383838;      /* Emphasized border */
+
+  /* Legacy aliases for backward compatibility */
+  --color-film:   #000000;
+  --color-film-2: #080808;
+  --color-film-3: #111111;
+  --color-line:   #1E1E1E;
+
+  /* ── Typography Colors ── */
+  --color-ivory:     #FFFFFF;       /* Crisp pure white */
+  --color-ivory-dim: #94949E;       /* Muted silver / secondary text */
+  --color-bone:     #FFFFFF;
+  --color-bone-dim: #94949E;
+  --color-paper:    #FAFAFA;
+  --color-ink:      #000000;
+  --color-ink-dim:  #505050;
+
+  /* ── Metallic Gold Spectrum ── */
+  --color-gold:        #D4AF37;     /* Imperial Pure Gold */
+  --color-gold-bright: #F5E59F;     /* Shimmering Highlight Gold */
+  --color-gold-dim:    #8F7322;     /* Burnished Bronze Gold */
+  --color-gold-dark:   #594411;     /* Deep Gold Outline */
+  --color-beam:        #D4AF37;     /* Map legacy beam -> gold */
+
+  /* ── Semantic Severity ── */
+  --color-critical:   #EF4444;      /* Pure vivid red */
+  --color-high:       #F59E0B;      /* Warm amber */
+  --color-medium:     #EAB308;      /* Pure gold-amber */
+  --color-low:        #84CC16;      /* Lime */
+  --color-clear:      #10B981;      /* Emerald */
+  --color-unverified: #6B7280;      /* Neutral gray */
+
+  /* ── Executive Stylish Fonts ── */
+  --font-sans:    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Cinzel", "Playfair Display", Georgia, serif;
+  --font-serif:   "Playfair Display", Georgia, serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  --film: #0F1E2B;
-  --film-2: #15283A;
-  --film-3: #1F3851;
-  --line: #27435E;
-  --bone: #E6EDF2;
-  --bone-dim: #9FB2C2;
-  --beam: #7FD8E8;
-  --paper: #EEF0EA;
-  --ink: #1B2430;
-  --ink-dim: #5A6573;
-  --critical: #FF5A4E;
-  --high: #FF8A3D;
-  --medium: #FFC23D;
-  --low: #C9D46A;
-  --clear: #8FE0AE;
-  --unverified: #8EA3B5;
+  --obsidian:   #000000;
+  --obsidian-2: #080808;
+  --obsidian-3: #111111;
+  --obsidian-4: #181818;
+  --charcoal:   #1C1C1C;
+  --charcoal-2: #282828;
 
-  --sans: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
-  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --film:   #000000;
+  --film-2: #080808;
+  --film-3: #111111;
+  --line:   #1E1E1E;
+
+  --ivory:     #FFFFFF;
+  --ivory-dim: #94949E;
+  --bone:      #FFFFFF;
+  --bone-dim:  #94949E;
+
+  --gold:        #D4AF37;
+  --gold-bright: #F5E59F;
+  --gold-dim:    #8F7322;
+  --beam:        #D4AF37;
+
+  --critical:   #EF4444;
+  --high:       #F59E0B;
+  --medium:     #EAB308;
+  --low:        #84CC16;
+  --clear:      #10B981;
+  --unverified: #6B7280;
 
   color-scheme: dark;
 }
 
+/* ── Actual Pure Black Body ── */
 body {
   margin: 0;
-  background-color: var(--film);
-  color: var(--bone);
-  font-family: var(--sans);
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(31, 56, 81, 0.45) 0%, transparent 55%),
-    radial-gradient(120% 70% at 75% 0%, #183049 0%, transparent 60%);
+  background-color: #000000 !important;
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  /* Luxury atmospheric lighting: subtle ambient gold bloom at the top */
+  background-image:
+    radial-gradient(ellipse 90% 45% at 50% -5%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 25% at 90% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 50%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-/* Severity Color Bindings */
-[data-sev="critical"] { --c: var(--critical); }
-[data-sev="high"] { --c: var(--high); }
-[data-sev="medium"] { --c: var(--medium); }
-[data-sev="low"] { --c: var(--low); }
-[data-sev="clear"] { --c: var(--clear); }
-[data-sev="unverified"] { --c: var(--unverified); }
-
-/* Animation Keyframes */
-@keyframes sweep {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
+/* ── Custom Selection ── */
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: #FFFFFF;
 }
 
-@keyframes flash {
-  0% { background-color: rgba(127, 216, 232, 0.45); }
-  100% { background-color: transparent; }
+/* ── Gold Gradient Metallic Text ── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5E59F 30%, #D4AF37 70%, #AA820A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes pulseGlow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.92); }
+.text-gold-pure {
+  background: linear-gradient(135deg, #FFF1B5 0%, #E5C158 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes beamSweep {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(300%); }
+/* ── Gold Hairline Border Utilities ── */
+.gold-hairline {
+  position: relative;
+}
+.gold-hairline::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.5) 50%, transparent 100%);
+  pointer-events: none;
 }
 
-@keyframes radarSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.gold-hairline-top {
+  position: relative;
+}
+.gold-hairline-top::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.5) 50%, transparent 100%);
+  pointer-events: none;
 }
 
-@keyframes borderRotate {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-sweep {
-  animation: sweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-.animate-flash {
-  animation: flash 1.1s ease;
-}
-
-.animate-pulseGlow {
-  animation: pulseGlow 1.6s ease-in-out infinite;
-}
-
-.animate-radar {
-  animation: radarSpin 4s linear infinite;
-}
-
-/* Glassmorphism & Depth Utilities */
+/* ── Luxury Glass & Card Surfaces ── */
 .glass-panel {
-  background: rgba(21, 40, 58, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(39, 67, 94, 0.65);
-  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: rgba(8, 8, 8, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(212, 175, 55, 0.08);
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(21, 40, 58, 0.75) 0%, rgba(15, 30, 43, 0.85) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(39, 67, 94, 0.6);
-  box-shadow: 0 16px 36px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(14, 14, 14, 0.9) 0%, rgba(6, 6, 6, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .glass-card-hover {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card-hover:hover {
-  border-color: rgba(127, 216, 232, 0.45);
+  border-color: rgba(212, 175, 55, 0.45);
   transform: translateY(-2px);
-  box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.75), 0 0 25px -6px rgba(127, 216, 232, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.95), 0 0 25px -4px rgba(212, 175, 55, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Fintech dot and grid backdrops */
+/* ── Gold Luxury Button ── */
+.btn-gold {
+  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #AA820A 100%);
+  background-size: 200% 200%;
+  color: #000000;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.35);
+}
+.btn-gold:hover {
+  background-position: right center;
+  box-shadow: 0 4px 25px rgba(212, 175, 55, 0.6);
+  transform: translateY(-1px);
+}
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+/* ── Fine Gold Pill Badge ── */
+.gold-badge {
+  background: rgba(212, 175, 55, 0.10);
+  border: 1px solid rgba(212, 175, 55, 0.30);
+  color: #F5E59F;
+}
+
+/* ── Fintech Grid & Dot Backdrops ── */
 .bg-grid-fintech {
-  background-image: 
-    linear-gradient(to right, rgba(230, 237, 242, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(230, 237, 242, 0.04) 1px, transparent 1px);
+  background-image:
+    linear-gradient(to right, rgba(212, 175, 55, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 175, 55, 0.035) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .bg-dots-fintech {
-  background-image: radial-gradient(rgba(127, 216, 232, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(212, 175, 55, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Custom scrollbars */
+/* ── Sleek Gold Custom Scrollbars ── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--film-2);
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--line);
-  border-radius: 3px;
+  background: #222222;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--bone-dim);
+  background: #D4AF37;
 }
 
-/* Accessibility: prefers-reduced-motion */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Keyframe Animations ── */
+@keyframes sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes flash {
+  0%   { background-color: rgba(212, 175, 55, 0.35); }
+  100% { background-color: transparent; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(0.94); }
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-sweep      { animation: sweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.animate-flash      { animation: flash 1.1s ease; }
+.animate-pulseGlow  { animation: pulseGlow 1.6s ease-in-out infinite; }
+.animate-radar      { animation: radarSpin 4s linear infinite; }
+
+/* ── Accessibility ── */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-/* Print Styles */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #111827 !important;
   }
 }

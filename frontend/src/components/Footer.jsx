@@ -7,62 +7,72 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative mt-16 border-t border-[#27435E]/80 bg-gradient-to-b from-[#09131C] to-[#060D14] text-xs text-[#7A90A4]">
-      {/* Laser hairline on the top edge */}
+    <footer className="relative mt-20 border-t border-[#1C1C1C] bg-black text-xs text-[#888888]">
+      {/* Metallic Gold Hairline on top edge */}
       <div 
-        className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-beam/70 to-transparent" 
+        className="pointer-events-none absolute inset-x-0 -top-px h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" 
         aria-hidden="true" 
       />
 
-      <div className="max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-8 pb-10 border-b border-[#27435E]/50">
+      <div className="max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-8 pb-10 border-b border-[#1A1A1A]">
           <div>
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="grid place-items-center w-7 h-7 rounded-lg bg-[#142A3E] border border-line text-beam">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="grid place-items-center w-8 h-8 rounded-xl bg-[#0D0D0D] border border-[#D4AF37]/40 text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                 <svg viewBox="0 0 32 32" className="w-4 h-4" aria-hidden="true">
-                  <path d="M7 9h18M7 16h12M7 23h15" stroke="#E6EDF2" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-                  <rect x="4" y="14.5" width="24" height="3" fill="#7FD8E8" opacity="0.9" rx="1.5" />
+                  <path d="M7 9h18M7 16h12M7 23h15" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+                  <rect x="4" y="14.5" width="24" height="3" fill="#D4AF37" rx="1.5" />
                 </svg>
               </div>
-              <span className="font-['Bricolage_Grotesque'] font-bold text-bone text-base">
-                IPO X-Ray
+              <span className="font-['Cinzel'] tracking-wider font-extrabold text-white text-base">
+                IPO X-RAY 360
               </span>
-              <span className="font-mono text-[10px] text-beam px-1.5 py-0.5 rounded bg-beam/10 border border-beam/20">
-                FORENSICS
+              <span className="font-mono text-[10px] text-[#F5E59F] px-2 py-0.5 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 font-semibold">
+                FORENSICS & SURVEILLANCE
               </span>
             </div>
             
-            <p className="max-w-[65ch] text-bone-dim leading-relaxed text-xs sm:text-sm">
-              IPO X-Ray screens public information automatically using parallel autonomous web agents and gradient-boosted risk modeling. It is designed to expose undisclosed promoter linkages, synthetic vendors, and valuation disconnects before retail capital is committed.
+            <p className="max-w-[65ch] text-[#888888] leading-relaxed text-xs sm:text-sm font-sans">
+              IPO X-Ray 360 performs automated multi-source forensic scrutiny across DRHP disclosures, ROC MCA records, EPFO employee rosters, and promoter networks using autonomous web agents and gradient-boosted risk models before retail and institutional capital is deployed.
             </p>
           </div>
 
           <div className="flex flex-col md:items-end justify-between gap-4">
-            {/* Tech stack badge pill */}
             <div className="flex flex-wrap items-center md:justify-end gap-2 font-mono text-[11px]">
-              <span className="px-2.5 py-1 rounded-md bg-[#0F2132] border border-line text-bone-dim">TinyFish Web Agents</span>
-              <span className="px-2.5 py-1 rounded-md bg-[#0F2132] border border-line text-bone-dim">LightGBM ML</span>
-              <span className="px-2.5 py-1 rounded-md bg-[#0F2132] border border-line text-bone-dim">FastAPI SSE</span>
+              <span className="px-3 py-1 rounded-lg bg-[#0A0A0A] border border-[#222222] text-[#888888]">Autonomous Web Agents</span>
+              <span className="px-3 py-1 rounded-lg bg-[#0A0A0A] border border-[#222222] text-[#888888]">ROC / EPFO Graph</span>
+              <span className="px-3 py-1 rounded-lg bg-[#0A0A0A] border border-[#222222] text-[#D4AF37]">ASBA Bid Preparation</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
+              <a href="/" className="text-[#888888] hover:text-[#D4AF37] transition-colors no-underline">Home</a>
+              <span className="text-[#333333]">·</span>
+              <a href="/dashboard" className="text-[#888888] hover:text-[#D4AF37] transition-colors no-underline">IPO Dashboard</a>
+              <span className="text-[#333333]">·</span>
+              <a href="/applications" className="text-[#888888] hover:text-[#D4AF37] transition-colors no-underline">Applications</a>
+              <span className="text-[#333333]">·</span>
+              <a href="/portfolio" className="text-[#888888] hover:text-[#D4AF37] transition-colors no-underline">Portfolio</a>
+              <span className="text-[#333333]">·</span>
+              <a href="/autospy" className="text-[#888888] hover:text-[#D4AF37] transition-colors no-underline">AutoSpy</a>
             </div>
 
             <button
               onClick={scrollToTop}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-line/70 bg-[#122334]/60 hover:bg-[#183149] hover:border-beam/50 text-bone-dim hover:text-bone text-xs font-mono transition-all duration-200 self-start md:self-auto cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#222222] bg-[#0A0A0A] hover:bg-[#141414] hover:border-[#D4AF37]/50 text-[#888888] hover:text-white text-xs font-mono transition-all duration-200 self-start md:self-auto cursor-pointer"
             >
-              <ArrowUp className="w-3.5 h-3.5 text-beam" />
+              <ArrowUp className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Back to top</span>
             </button>
           </div>
         </div>
 
-        {/* Bottom Disclaimer + Credit Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 text-[11px] font-mono text-[#62778A]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 text-[11px] font-mono text-[#666666]">
           <p className="max-w-[70ch] leading-relaxed">
-            Legal Disclaimer: Automated screening of public records only. Not investment advice and a flag is not conclusive legal proof of wrongdoing. Always verify every flag before acting.
+            Regulatory Notice: Autonomous screening of public offer records. Not registered SEBI investment advice. All material findings cross-referenced with official filings.
           </p>
-          <div className="whitespace-nowrap inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-line/60 bg-[#0E1F2E]/60 backdrop-blur-sm self-start sm:self-auto text-bone-dim">
-            <span className="w-1.5 h-1.5 rounded-full bg-beam shadow-[0_0_8px_rgba(127,216,232,0.8)] animate-pulse" aria-hidden="true" />
-            <span>Built for HackIIITD 2026 on TinyFish web agents</span>
+          <div className="whitespace-nowrap inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#222222] bg-[#080808] text-[#888888]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.8)] animate-pulse" aria-hidden="true" />
+            <span>Autonomous Intelligence Engine</span>
           </div>
         </div>
       </div>

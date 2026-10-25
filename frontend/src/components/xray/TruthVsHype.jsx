@@ -14,7 +14,7 @@ const SAMPLE = `2024-01-15 Buy RELIANCE target 3000 sl 2600 in 2 months
 
 const rs = (n) => (n == null ? '–' : `${n < 0 ? '−' : ''}₹${Math.abs(Math.round(n)).toLocaleString('en-IN')}`);
 const pct = (n) => (n == null ? '–' : `${n > 0 ? '+' : ''}${n}%`);
-const tone = (n) => (n == null ? 'text-bone-dim' : n > 0 ? 'text-clear' : n < 0 ? 'text-critical' : 'text-bone');
+const tone = (n) => (n == null ? 'text-zinc-500' : n > 0 ? 'text-[#8FE0AE]' : n < 0 ? 'text-[#FF5A4E]' : 'text-white');
 
 /** Cumulative P&L of ₹10k per call, in exit order. Single series: the title names it, no legend. */
 function Curve({ points }) {
@@ -41,34 +41,34 @@ function Curve({ points }) {
         aria-label={`Cumulative profit and loss, ending at ${rs(points[points.length - 1]?.pnl)}`}>
         {ticks.map((t, i) => (
           <g key={i}>
-            <line x1={L} x2={W - R} y1={y(t)} y2={y(t)} stroke="#27435E" strokeWidth="1" strokeDasharray={t === 0 ? '' : '2 4'} />
-            <text x={L - 8} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#9FB2C2">{rs(t)}</text>
+            <line x1={L} x2={W - R} y1={y(t)} y2={y(t)} stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray={t === 0 ? '' : '2 4'} />
+            <text x={L - 8} y={y(t) + 4} textAnchor="end" fontSize="10" fill="#71717A" fontFamily="JetBrains Mono">{rs(t)}</text>
           </g>
         ))}
-        <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} stroke="#9FB2C2" strokeWidth="1" />
-        <path d={path} fill="none" stroke="#7FD8E8" strokeWidth="2" strokeLinejoin="round" />
-        {points.length < 40 && points.map((p, i) => <circle key={i} cx={x(i)} cy={y(p.pnl)} r="4" fill="#7FD8E8" stroke="#15283A" strokeWidth="2" />)}
-        <text x={L} y={H - 8} fontSize="11" fill="#9FB2C2">{points[0]?.date}</text>
-        <text x={W - R} y={H - 8} fontSize="11" fill="#9FB2C2" textAnchor="end">{points[points.length - 1]?.date}</text>
-        {h && <line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} stroke="#9FB2C2" strokeWidth="1" strokeDasharray="3 3" />}
-        {h && <circle cx={x(hover)} cy={y(h.pnl)} r="5" fill="#7FD8E8" stroke="#E6EDF2" strokeWidth="2" />}
+        <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} stroke="rgba(212,175,55,0.3)" strokeWidth="1" />
+        <path d={path} fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinejoin="round" />
+        {points.length < 40 && points.map((p, i) => <circle key={i} cx={x(i)} cy={y(p.pnl)} r="4" fill="#D4AF37" stroke="#000000" strokeWidth="2" />)}
+        <text x={L} y={H - 8} fontSize="10" fill="#71717A" fontFamily="JetBrains Mono">{points[0]?.date}</text>
+        <text x={W - R} y={H - 8} fontSize="10" fill="#71717A" fontFamily="JetBrains Mono" textAnchor="end">{points[points.length - 1]?.date}</text>
+        {h && <line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} stroke="rgba(255,255,255,0.3)" strokeWidth="1" strokeDasharray="3 3" />}
+        {h && <circle cx={x(hover)} cy={y(h.pnl)} r="5" fill="#F5E59F" stroke="#000000" strokeWidth="2" />}
       </svg>
       {h && (
-        <div className="absolute top-2 right-2 rounded-lg border border-line bg-film px-3 py-2 text-xs pointer-events-none">
-          <div className="text-bone-dim">{h.date} · after {h.symbol}</div>
-          <div className="text-bone font-semibold tabular-nums">{rs(h.pnl)} total</div>
+        <div className="absolute top-2 right-2 rounded-xl border border-white/10 bg-black/90 backdrop-blur-md px-3.5 py-2 text-xs pointer-events-none shadow-xl">
+          <div className="text-zinc-400 font-mono">{h.date} · after {h.symbol}</div>
+          <div className="text-[#D4AF37] font-mono font-bold tabular-nums mt-0.5">{rs(h.pnl)} total</div>
         </div>
       )}
     </div>
   );
 }
 
-function Tile({ label, value, sub, cls = 'text-bone' }) {
+function Tile({ label, value, sub, cls = 'text-white' }) {
   return (
-    <div className="rounded-xl border border-line bg-film-2/60 p-3">
-      <div className="text-xs text-bone-dim">{label}</div>
-      <div className={`text-2xl font-bold tabular-nums ${cls}`}>{value}</div>
-      {sub && <div className="text-[11px] text-bone-dim mt-0.5">{sub}</div>}
+    <div className="rounded-2xl border border-white/10 bg-[#080808] p-4">
+      <div className="text-[10px] uppercase font-mono tracking-wider text-zinc-400">{label}</div>
+      <div className={`text-2xl font-mono font-bold tabular-nums mt-1 ${cls}`}>{value}</div>
+      {sub && <div className="text-[11px] font-mono text-zinc-500 mt-0.5">{sub}</div>}
     </div>
   );
 }
@@ -133,10 +133,10 @@ export default function TruthVsHype() {
 
   return (
     <div>
-      <div className="rounded-2xl border border-line bg-film-2/70 p-5">
+      <div className="rounded-2xl border border-white/10 bg-[#080808] p-5">
         <div className="grid lg:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs text-bone-dim" htmlFor="calls-text">Paste dated calls, one per line</label>
+            <label className="text-xs font-mono text-zinc-400" htmlFor="calls-text">Paste dated promotion calls (one per line)</label>
             <textarea id="calls-text" className={`${inputCls} w-full h-40 mt-1 font-mono text-xs`} value={text} onChange={(e) => setText(e.target.value)}
               placeholder="2024-03-12 BUY TATAPOWER target 450 sl 380" />
             <div className="flex gap-2 mt-2">
@@ -145,38 +145,38 @@ export default function TruthVsHype() {
             </div>
           </div>
           <div>
-            <label className="text-xs text-bone-dim" htmlFor="calls-handle">…or let an agent collect public calls</label>
+            <label className="text-xs font-mono text-zinc-400" htmlFor="calls-handle">…or collect public channel disclosures</label>
             <input id="calls-handle" className={`${inputCls} w-full mt-1`} value={handle} onChange={(e) => setHandle(e.target.value)}
               placeholder="t.me/channelname, a page URL, or the influencer's name" onKeyDown={(e) => e.key === 'Enter' && collectCalls()} />
             <button className={`${btnCls} mt-2`} disabled={busy || !handle.trim()} onClick={collectCalls}>Collect public calls</button>
-            <p className="text-xs text-bone-dim mt-2">Only public, dated posts. Deleted posts cannot be found, which usually makes a record look better than it was.</p>
+            <p className="text-xs text-zinc-500 mt-2 font-sans">Only public, dated posts. Deleted posts cannot be found, which usually makes a record look better than it was.</p>
             <div className="grid grid-cols-3 gap-2 mt-3">
-              <label className="text-xs text-bone-dim">Hold (sessions)<input type="number" min="1" max="250" className={`${inputCls} w-full mt-1`} value={horizon} onChange={(e) => setHorizon(e.target.value)} /></label>
-              <label className="text-xs text-bone-dim">Costs % round trip<input type="number" step="0.05" min="0" max="5" className={`${inputCls} w-full mt-1`} value={cost} onChange={(e) => setCost(e.target.value)} /></label>
-              <label className="text-xs text-bone-dim">Claimed accuracy %<input type="number" min="0" max="100" className={`${inputCls} w-full mt-1`} value={claimed} onChange={(e) => setClaimed(e.target.value)} placeholder="e.g. 90" /></label>
+              <label className="text-xs font-mono text-zinc-400">Hold (sessions)<input type="number" min="1" max="250" className={`${inputCls} w-full mt-1`} value={horizon} onChange={(e) => setHorizon(e.target.value)} /></label>
+              <label className="text-xs font-mono text-zinc-400">Costs % round trip<input type="number" step="0.05" min="0" max="5" className={`${inputCls} w-full mt-1`} value={cost} onChange={(e) => setCost(e.target.value)} /></label>
+              <label className="text-xs font-mono text-zinc-400">Claimed accuracy %<input type="number" min="0" max="100" className={`${inputCls} w-full mt-1`} value={claimed} onChange={(e) => setClaimed(e.target.value)} placeholder="e.g. 90" /></label>
             </div>
           </div>
         </div>
         <Lanes lanes={lanes} />
-        {msg && <p className="mt-3 text-sm text-beam" role="status">{msg}</p>}
-        {skipped.length > 0 && <p className="mt-2 text-xs text-medium">Skipped {skipped.length} line(s) without a date or symbol: {skipped.slice(0, 3).join(' | ')}{skipped.length > 3 ? ' …' : ''}</p>}
+        {msg && <p className="mt-3 text-sm text-[#D4AF37] font-mono" role="status">{msg}</p>}
+        {skipped.length > 0 && <p className="mt-2 text-xs text-[#FFC23D] font-mono">Skipped {skipped.length} line(s) without a date or symbol: {skipped.slice(0, 3).join(' | ')}{skipped.length > 3 ? ' …' : ''}</p>}
         {calls.length > 0 && (
-          <div className="mt-4">
+          <div className="mt-5">
             <div className="flex items-center gap-3 mb-2">
-              <b className="text-bone text-sm flex-1">{calls.length} call(s) to audit</b>
-              <button className={btnPrimaryCls} disabled={busy} onClick={audit}>{busy ? 'Working…' : 'Audit against real prices'}</button>
+              <b className="text-white text-sm flex-1 font-mono">{calls.length} call(s) ready to audit</b>
+              <button className={btnPrimaryCls} disabled={busy} onClick={audit}>{busy ? 'Auditing…' : 'Audit against real market prices'}</button>
             </div>
-            <div className="max-h-48 overflow-auto rounded-lg border border-line">
+            <div className="max-h-48 overflow-auto rounded-xl border border-white/10">
               <table className="w-full text-xs">
-                <thead className="text-bone-dim bg-film sticky top-0"><tr>{['Date', 'Call', 'Target', 'Stop', ''].map((h) => <th key={h} className="text-left px-2 py-1.5 font-medium">{h}</th>)}</tr></thead>
+                <thead className="text-zinc-400 bg-black sticky top-0 font-mono"><tr>{['Date', 'Call', 'Target', 'Stop', ''].map((h) => <th key={h} className="text-left px-3 py-2 font-medium">{h}</th>)}</tr></thead>
                 <tbody>
                   {calls.map((c, i) => (
-                    <tr key={i} className="border-t border-line">
-                      <td className="px-2 py-1 tabular-nums">{c.date}</td>
-                      <td className="px-2 py-1"><b className="text-bone">{c.direction.toUpperCase()} {c.symbol}</b></td>
-                      <td className="px-2 py-1 tabular-nums">{c.target ?? (c.target_multiple ? `${c.target_multiple}x` : '–')}</td>
-                      <td className="px-2 py-1 tabular-nums">{c.stop ?? '–'}</td>
-                      <td className="px-2 py-1 text-right"><button className="text-bone-dim hover:text-critical" aria-label={`Remove ${c.symbol}`} onClick={() => setCalls(calls.filter((_, j) => j !== i))}>✕</button></td>
+                    <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02]">
+                      <td className="px-3 py-1.5 tabular-nums text-zinc-300 font-mono">{c.date}</td>
+                      <td className="px-3 py-1.5"><b className="text-white font-mono">{c.direction.toUpperCase()} {c.symbol}</b></td>
+                      <td className="px-3 py-1.5 tabular-nums font-mono text-zinc-300">{c.target ?? (c.target_multiple ? `${c.target_multiple}x` : '–')}</td>
+                      <td className="px-3 py-1.5 tabular-nums font-mono text-zinc-300">{c.stop ?? '–'}</td>
+                      <td className="px-3 py-1.5 text-right"><button className="text-zinc-500 hover:text-rose-400" aria-label={`Remove ${c.symbol}`} onClick={() => setCalls(calls.filter((_, j) => j !== i))}>✕</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -188,42 +188,42 @@ export default function TruthVsHype() {
 
       {s && (
         <div className="mt-6">
-          {res.sample_note && <p className="mb-3 text-sm text-medium border-l-2 border-medium pl-3">{res.sample_note}</p>}
+          {res.sample_note && <p className="mb-3 text-sm text-[#FFC23D] border-l-2 border-[#FFC23D] pl-3">{res.sample_note}</p>}
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
             <Tile label="Calls that made money" value={s.win_rate_pct == null ? '–' : `${s.win_rate_pct}%`}
               sub={s.claimed_accuracy_pct != null ? `claimed ${s.claimed_accuracy_pct}%${s.claim_gap_pct != null ? ` · gap ${s.claim_gap_pct} pts` : ''}` : `${s.closed} closed calls`}
-              cls={s.claim_gap_pct > 10 ? 'text-critical' : 'text-bone'} />
+              cls={s.claim_gap_pct > 10 ? 'text-[#FF5A4E]' : 'text-white'} />
             <Tile label="Targets actually hit" value={s.target_hit_rate_pct == null ? '–' : `${s.target_hit_rate_pct}%`} sub="of calls with a target" />
             <Tile label="Average call, after costs" value={pct(s.avg_net_pct)} sub={`median ${pct(s.median_net_pct)}`} cls={tone(s.avg_net_pct)} />
             <Tile label="vs Nifty 50, same dates" value={pct(s.avg_excess_vs_nifty_pct)} sub="average excess return" cls={tone(s.avg_excess_vs_nifty_pct)} />
             <Tile label={`₹${s.stake_per_call.toLocaleString('en-IN')} in every call`} value={rs(s.total_pnl)} sub={`costs ${rs(s.total_costs)}`} cls={tone(s.total_pnl)} />
-            <Tile label="Biggest fall from a peak" value={rs(-s.max_drawdown)} sub={`${s.losers} losing call(s)`} cls={s.max_drawdown ? 'text-critical' : 'text-bone'} />
+            <Tile label="Biggest fall from a peak" value={rs(-s.max_drawdown)} sub={`${s.losers} losing call(s)`} cls={s.max_drawdown ? 'text-[#FF5A4E]' : 'text-white'} />
           </div>
           {res.curve.length > 1 && (
-            <div className="rounded-2xl border border-line bg-film-2/70 p-4 mt-4">
-              <h4 className="text-sm font-semibold text-bone mb-2">Running profit if you had followed every call with ₹{s.stake_per_call.toLocaleString('en-IN')}</h4>
+            <div className="rounded-2xl border border-white/10 bg-[#080808] p-5 mt-4">
+              <h4 className="text-sm font-semibold font-cinzel text-white mb-3">Running profit if you had followed every call with ₹{s.stake_per_call.toLocaleString('en-IN')}</h4>
               <Curve points={res.curve} />
             </div>
           )}
-          <div className="overflow-auto rounded-2xl border border-line mt-4">
+          <div className="overflow-auto rounded-2xl border border-white/10 mt-4">
             <table className="w-full text-xs">
-              <thead className="text-bone-dim bg-film-2"><tr>{['Call date', 'Call', 'Entry (next open)', 'Exit', 'Why it closed', 'After costs', 'Worst dip', 'Nifty', 'Source'].map((h) => <th key={h} className="text-left px-3 py-2 font-medium whitespace-nowrap">{h}</th>)}</tr></thead>
+              <thead className="text-zinc-400 bg-[#060606] font-mono"><tr>{['Call date', 'Call', 'Entry (next open)', 'Exit', 'Why it closed', 'After costs', 'Worst dip', 'Nifty', 'Source'].map((h) => <th key={h} className="text-left px-3 py-2.5 font-medium whitespace-nowrap">{h}</th>)}</tr></thead>
               <tbody>
                 {sorted.map((r, i) => (
-                  <tr key={i} className="border-t border-line align-top">
-                    <td className="px-3 py-2 tabular-nums whitespace-nowrap">{r.date}</td>
-                    <td className="px-3 py-2"><b className="text-bone">{r.direction.toUpperCase()} {r.symbol}</b>{r.target_used ? <div className="text-bone-dim">target {r.target_used}</div> : null}</td>
+                  <tr key={i} className="border-t border-white/5 align-top hover:bg-white/[0.02]">
+                    <td className="px-3 py-2 tabular-nums whitespace-nowrap font-mono text-zinc-300">{r.date}</td>
+                    <td className="px-3 py-2"><b className="text-white font-mono">{r.direction.toUpperCase()} {r.symbol}</b>{r.target_used ? <div className="text-zinc-500 font-mono">target {r.target_used}</div> : null}</td>
                     {r.status === 'insufficient_data' ? (
-                      <td colSpan={6} className="px-3 py-2 text-medium">Insufficient data: {r.reason}</td>
+                      <td colSpan={6} className="px-3 py-2 text-[#FFC23D] font-mono">Insufficient data: {r.reason}</td>
                     ) : (
                       <>
-                        <td className="px-3 py-2 tabular-nums whitespace-nowrap">{r.entry_price} <span className="text-bone-dim">{r.entry_date}</span></td>
-                        <td className="px-3 py-2 tabular-nums whitespace-nowrap">{r.exit_price} <span className="text-bone-dim">{r.exit_date}</span></td>
-                        <td className="px-3 py-2">{r.exit_reason}{r.split_factor ? <div className="text-bone-dim">adjusted for a {r.split_factor}:1 split/bonus</div> : null}
-                          {(r.level_notes || []).map((n) => <div key={n} className="text-medium">{n}</div>)}</td>
-                        <td className={`px-3 py-2 tabular-nums font-semibold ${tone(r.net_pct)}`}>{pct(r.net_pct)}</td>
-                        <td className="px-3 py-2 tabular-nums text-bone-dim">{pct(r.worst_drawdown_pct)}</td>
-                        <td className="px-3 py-2 tabular-nums text-bone-dim">{pct(r.nifty_pct)}</td>
+                        <td className="px-3 py-2 tabular-nums whitespace-nowrap font-mono text-zinc-300">{r.entry_price} <span className="text-zinc-500">{r.entry_date}</span></td>
+                        <td className="px-3 py-2 tabular-nums whitespace-nowrap font-mono text-zinc-300">{r.exit_price} <span className="text-zinc-500">{r.exit_date}</span></td>
+                        <td className="px-3 py-2 text-zinc-300">{r.exit_reason}{r.split_factor ? <div className="text-zinc-500 font-mono">adjusted for a {r.split_factor}:1 split/bonus</div> : null}
+                          {(r.level_notes || []).map((n) => <div key={n} className="text-[#FFC23D] font-mono">{n}</div>)}</td>
+                        <td className={`px-3 py-2 tabular-nums font-mono font-semibold ${tone(r.net_pct)}`}>{pct(r.net_pct)}</td>
+                        <td className="px-3 py-2 tabular-nums font-mono text-zinc-400">{pct(r.worst_drawdown_pct)}</td>
+                        <td className="px-3 py-2 tabular-nums font-mono text-zinc-400">{pct(r.nifty_pct)}</td>
                       </>
                     )}
                     <td className="px-3 py-2"><SourceLink url={r.source_url}>post</SourceLink> <SourceLink url={r.price_source}>prices</SourceLink></td>
@@ -232,7 +232,7 @@ export default function TruthVsHype() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-bone-dim mt-3">
+          <p className="text-xs text-zinc-500 mt-3 font-sans">
             Entry is the open of the session after the call, so no call gets credit for a price seen before it was posted. If a target and a stop fall in the same day, the stop is assumed. {res.disclaimer}
           </p>
         </div>

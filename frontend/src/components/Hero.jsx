@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   ArrowRight, 
@@ -11,7 +12,8 @@ import {
   TrendingUp, 
   FileCheck,
   X,
-  Play
+  Play,
+  Compass
 } from 'lucide-react';
 
 const SAMPLE_MARKS = [
@@ -60,25 +62,25 @@ const SAMPLE_MARKS = [
 ];
 
 const SEV_HEX = {
-  critical: '#FF5A4E',
-  high: '#FF8A3D',
-  medium: '#FFC23D',
-  clear: '#8FE0AE',
+  critical: '#EF4444',
+  high: '#F59E0B',
+  medium: '#D4AF37',
+  clear: '#10B981',
 };
 
 const SEV_COLOR_CLASSES = {
-  critical: 'bg-critical/20 hover:bg-critical/35 text-critical border-critical/50 shadow-[inset_0_-2px_0_#FF5A4E]',
-  high: 'bg-high/20 hover:bg-high/35 text-high border-high/50 shadow-[inset_0_-2px_0_#FF8A3D]',
-  medium: 'bg-medium/20 hover:bg-medium/35 text-medium border-medium/50 shadow-[inset_0_-2px_0_#FFC23D]',
-  clear: 'bg-clear/20 hover:bg-clear/35 text-clear border-clear/50 shadow-[inset_0_-2px_0_#8FE0AE]',
+  critical: 'bg-rose-500/20 hover:bg-rose-500/35 text-rose-400 border-rose-500/50 shadow-[inset_0_-2px_0_#EF4444]',
+  high: 'bg-amber-500/20 hover:bg-amber-500/35 text-amber-400 border-amber-500/50 shadow-[inset_0_-2px_0_#F59E0B]',
+  medium: 'bg-[#D4AF37]/20 hover:bg-[#D4AF37]/35 text-[#F5E59F] border-[#D4AF37]/50 shadow-[inset_0_-2px_0_#D4AF37]',
+  clear: 'bg-emerald-500/20 hover:bg-emerald-500/35 text-emerald-400 border-emerald-500/50 shadow-[inset_0_-2px_0_#10B981]',
 };
 
 const CLAIM_CHIPS = [
-  { label: 'vendors', color: '#FF5A4E', icon: Building2 },
-  { label: 'clients', color: '#FFC23D', icon: Briefcase },
-  { label: 'directors', color: '#FF8A3D', icon: UserCheck },
-  { label: 'addresses', color: '#7FD8E8', icon: MapPin },
-  { label: 'revenue', color: '#8FE0AE', icon: TrendingUp },
+  { label: 'vendors', color: '#EF4444', icon: Building2 },
+  { label: 'clients', color: '#D4AF37', icon: Briefcase },
+  { label: 'directors', color: '#F59E0B', icon: UserCheck },
+  { label: 'addresses', color: '#F5E59F', icon: MapPin },
+  { label: 'revenue', color: '#10B981', icon: TrendingUp },
 ];
 
 const QUICK_SAMPLES = [
@@ -87,7 +89,6 @@ const QUICK_SAMPLES = [
   'Resourceful Automobile'
 ];
 
-// Self-contained keyframes
 const HERO_CSS = `
 @keyframes ix-rise { from { transform: translateY(110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes ix-fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
@@ -116,7 +117,7 @@ function Mark({ id, sev, activeId, setActiveId, children }) {
       onMouseLeave={() => setActiveId(null)}
       className={`px-1 py-0.5 rounded cursor-pointer transition-all duration-200 ${SEV_COLOR_CLASSES[sev]} ${
         isActive 
-          ? 'ring-2 ring-current ring-offset-2 ring-offset-[#EEF0EA] scale-[1.03] shadow-md' 
+          ? 'ring-2 ring-current ring-offset-2 ring-offset-[#0A0A0A] scale-[1.03] shadow-md' 
           : 'hover:scale-[1.01]'
       }`}
     >
@@ -137,7 +138,6 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
   const critical = SAMPLE_MARKS.filter((m) => m.sev === 'critical').length;
   const high = SAMPLE_MARKS.filter((m) => m.sev === 'high').length;
 
-  // cursor spotlight: sets CSS vars on mouse move
   const handleMouseMove = (e) => {
     const el = sectionRef.current;
     if (!el) return;
@@ -146,24 +146,25 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
     el.style.setProperty('--my', `${e.clientY - r.top}px`);
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmed = company.trim();
-    if (!trimmed) {
-      setFormMsg('Enter the company name as it appears on the IPO application.');
-      return;
+    if (trimmed) {
+      navigate(`/dashboard?q=${encodeURIComponent(trimmed)}`);
+    } else {
+      navigate('/dashboard');
     }
-    if (!isLive) {
-      setFormMsg('Live autonomous agents need TINYFISH_API_KEY in backend/.env. Try running the sample case below meanwhile!');
-      return;
-    }
-    setFormMsg('');
-    onStart({ company: trimmed, file, demo: false });
   };
 
   const handleSample = () => {
     setFormMsg('');
-    onStart({ company: '', file: null, demo: true });
+    if (onStart) {
+      onStart({ company: '', file: null, demo: true });
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const handleFileChange = (e) => {
@@ -183,8 +184,8 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
     if (dropped && dropped.type === 'application/pdf') {
       setFile(dropped);
       setFormMsg('');
-    } else {
-      setFormMsg('Please drop a valid PDF file of the DRHP.');
+    } else if (dropped) {
+      setFormMsg('Please drop a valid DRHP PDF.');
     }
   };
 
@@ -198,38 +199,38 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative isolate overflow-hidden pt-4 pb-16 lg:py-20"
+      className="relative isolate overflow-hidden pb-16 pt-4 lg:pb-20"
       id="top"
     >
       <style>{HERO_CSS}</style>
 
-      {/* ───────── Ambient Background: Cyber Grid & Auroras ───────── */}
+      {/* Ambient Background: Luxury Gold Spotlight Auroras on Pure Black */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-32 left-[5%] w-[45rem] h-[45rem] rounded-full bg-beam/[0.12] blur-[140px]" />
-        <div className="absolute top-1/4 right-[-10%] w-[40rem] h-[40rem] rounded-full bg-[#1F4B78]/[0.22] blur-[150px]" />
-        <div className="absolute bottom-[-10rem] left-1/4 w-[32rem] h-[32rem] rounded-full bg-critical/[0.07] blur-[130px]" />
+        <div className="absolute -top-32 left-[10%] w-[45rem] h-[45rem] rounded-full bg-[#D4AF37]/[0.06] blur-[150px]" />
+        <div className="absolute top-1/4 right-[-5%] w-[40rem] h-[40rem] rounded-full bg-[#8F7322]/[0.08] blur-[150px]" />
+        <div className="absolute bottom-[-10rem] left-1/3 w-[32rem] h-[32rem] rounded-full bg-rose-500/[0.04] blur-[140px]" />
         
         {/* Subtle geometric dot grid */}
-        <div className="absolute inset-0 bg-dots-fintech opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
+        <div className="absolute inset-0 bg-dots-fintech opacity-30 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
         
         {/* Dynamic cursor spotlight glow */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(580px circle at var(--mx, 65%) var(--my, 30%), rgba(127,216,232,0.12), transparent 60%)',
+              'radial-gradient(580px circle at var(--mx, 65%) var(--my, 30%), rgba(212,175,55,0.08), transparent 60%)',
           }}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-14 items-center px-4 sm:px-8 lg:px-12 max-w-[1560px] mx-auto min-h-[calc(100svh-90px)]">
-        {/* ───────── Left Column: Headlines & Form ───────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-14 items-center px-4 sm:px-6 lg:px-8 max-w-[1480px] mx-auto min-h-[calc(100svh-90px)]">
+        {/* Left Column: Headlines & Form */}
         <div className="relative z-10 flex flex-col justify-center">
           {/* Market Intelligence Ticker Badge */}
-          <div className="ix-fade inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-beam/30 bg-[#0E1F2E]/70 backdrop-blur-md text-xs text-beam mb-6 w-fit shadow-[0_0_20px_rgba(127,216,232,0.15)]">
+          <div className="ix-fade inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D4AF37]/30 bg-[#0A0A0A]/80 backdrop-blur-md text-xs text-[#F5E59F] mb-6 w-fit shadow-[0_0_20px_rgba(212,175,55,0.15)]">
             <span className="relative flex w-2 h-2">
-              <span className="absolute inline-flex w-full h-full rounded-full bg-beam opacity-75 animate-ping" />
-              <span className="relative inline-flex w-2 h-2 rounded-full bg-beam" />
+              <span className="absolute inline-flex w-full h-full rounded-full bg-[#D4AF37] opacity-75 animate-ping" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-[#D4AF37]" />
             </span>
             <span className="font-mono font-medium tracking-wide">
               NSE · BSE SME OFFER DOCUMENT INVESTIGATOR
@@ -237,37 +238,37 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.0] font-['Bricolage_Grotesque']">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.0] font-['Cinzel']">
             <span className="block overflow-hidden pb-1">
-              <span className="ix-rise text-bone">Read the prospectus</span>
+              <span className="ix-rise text-white">Read the prospectus</span>
             </span>
             <span className="block overflow-hidden pb-1">
-              <span className="ix-rise text-bone" style={{ animationDelay: '0.1s' }}>
+              <span className="ix-rise text-white" style={{ animationDelay: '0.1s' }}>
                 like an investigator
               </span>
             </span>
             <span className="block overflow-hidden pb-1">
               <span className="ix-rise" style={{ animationDelay: '0.2s' }}>
-                <span className="ix-shimmer bg-gradient-to-r from-beam via-[#EAFBFF] to-beam bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(127,216,232,0.5)]">
+                <span className="ix-shimmer bg-gradient-to-r from-white via-[#F5E59F] to-[#D4AF37] bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(212,175,55,0.35)]">
                   would.
                 </span>
               </span>
             </span>
           </h1>
 
-          <p className="ix-fade max-w-[56ch] mt-6 text-base sm:text-lg text-bone-dim leading-relaxed" style={{ animationDelay: '0.35s' }}>
-            Name an SME IPO. IPO X-Ray extracts every checkable claim from its offer document — vendors, clients, directors, addresses, revenue — and dispatches autonomous web agents to cross-examine registries, maps, tender portals and WHOIS data before you invest.
+          <p className="ix-fade max-w-[56ch] mt-6 text-base sm:text-lg text-[#888888] leading-relaxed font-sans" style={{ animationDelay: '0.35s' }}>
+            Name an SME IPO. IPO X-Ray 360 extracts checkable disclosures from the offer document — vendors, clients, directors, physical sites, revenue — and dispatches autonomous agents to cross-examine registries, maps, and tender records before you commit capital.
           </p>
 
           {/* Claim categories chips */}
           <div className="ix-fade flex flex-wrap items-center gap-2 mt-5" style={{ animationDelay: '0.45s' }}>
-            <span className="text-xs font-mono text-bone-dim mr-1">Checking:</span>
+            <span className="text-xs font-mono text-[#888888] mr-1">Checking:</span>
             {CLAIM_CHIPS.map((c) => {
               const Icon = c.icon;
               return (
                 <div
                   key={c.label}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#27435E]/80 bg-[#122232]/80 backdrop-blur-sm text-xs text-bone-dim capitalize transition-all hover:border-beam/40 hover:text-bone"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#222222] bg-[#0A0A0A] backdrop-blur-sm text-xs text-[#888888] capitalize transition-all hover:border-[#D4AF37]/50 hover:text-white"
                 >
                   <Icon className="w-3.5 h-3.5" style={{ color: c.color }} />
                   <span>{c.label}</span>
@@ -279,22 +280,21 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
           {/* Form container */}
           <form id="probe" className="ix-fade mt-8 max-w-xl" style={{ animationDelay: '0.55s' }} onSubmit={handleSubmit} noValidate>
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="company" className="text-xs sm:text-sm text-bone font-medium flex items-center gap-1.5">
+              <label htmlFor="company" className="text-xs sm:text-sm text-white font-semibold flex items-center gap-1.5">
                 <span>Enter SME Issuer Name</span>
-                <span className="text-[#62788C] font-normal text-xs">(as filed on NSE/BSE)</span>
+                <span className="text-[#666666] font-normal text-xs">(as filed on NSE/BSE)</span>
               </label>
             </div>
 
             {/* Glowing Search Bar */}
-            <div className="group/bar relative rounded-2xl p-[1.5px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(127,216,232,0.35)] transition-all duration-300">
-              {/* Rotating conic gradient border */}
+            <div className="group/bar relative rounded-2xl p-[1.5px] overflow-hidden shadow-[0_20px_50px_-20px_rgba(212,175,55,0.25)] transition-all duration-300">
               <div 
-                className="absolute inset-[-150%] ix-spin opacity-50 group-focus-within/bar:opacity-100 transition-opacity duration-500 [background:conic-gradient(from_0deg,transparent_0deg,#7FD8E8_80deg,transparent_160deg,transparent_240deg,#3F7FBF_310deg,transparent_360deg)]" 
+                className="absolute inset-[-150%] ix-spin opacity-40 group-focus-within/bar:opacity-100 transition-opacity duration-500 [background:conic-gradient(from_0deg,transparent_0deg,#D4AF37_80deg,transparent_160deg,transparent_240deg,#996515_310deg,transparent_360deg)]" 
                 aria-hidden="true" 
               />
-              <div className="relative flex flex-col sm:flex-row gap-2 bg-[#091522] rounded-[14px] p-2 border border-[#27435E]/50">
+              <div className="relative flex flex-col sm:flex-row gap-2 bg-[#080808] rounded-[14px] p-2 border border-[#222222]">
                 <div className="flex items-center flex-1 min-w-0 gap-2.5 pl-3">
-                  <Search className="w-5 h-5 flex-none text-bone-dim group-focus-within/bar:text-beam transition-colors" aria-hidden="true" />
+                  <Search className="w-5 h-5 flex-none text-[#888888] group-focus-within/bar:text-[#D4AF37] transition-colors" aria-hidden="true" />
                   <input
                     id="company"
                     name="company"
@@ -302,13 +302,13 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                     onChange={(e) => setCompany(e.target.value)}
                     autoComplete="off"
                     placeholder="e.g. Kalindi Smart Mobility Limited"
-                    className="flex-1 min-w-0 bg-transparent border-0 text-bone text-base sm:text-lg px-1 py-2.5 outline-none placeholder:text-[#5F7588]"
+                    className="flex-1 min-w-0 bg-transparent border-0 text-white text-base sm:text-lg px-1 py-2.5 outline-none placeholder:text-[#555555]"
                   />
                   {company && (
                     <button
                       type="button"
                       onClick={() => setCompany('')}
-                      className="p-1 rounded-md text-bone-dim hover:text-bone hover:bg-film-2/50"
+                      className="p-1 rounded-md text-[#888888] hover:text-white hover:bg-white/[0.05]"
                       aria-label="Clear input"
                     >
                       <X className="w-4 h-4" />
@@ -318,12 +318,12 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group/btn inline-flex items-center justify-center gap-2 bg-gradient-to-r from-beam via-[#A3EAF7] to-beam bg-[length:200%_auto] hover:bg-right text-[#091724] font-bold text-sm sm:text-base px-6 py-3 rounded-xl shadow-[0_0_24px_rgba(127,216,232,0.35)] hover:shadow-[0_0_36px_rgba(127,216,232,0.6)] active:scale-[0.98] transition-all duration-300 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-beam/70"
+                  className="btn-gold group/btn inline-flex items-center justify-center gap-2 text-black font-bold text-sm sm:text-base px-6 py-3 rounded-xl transition-all duration-300 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/70"
                   id="startBtn"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-[#091724] border-t-transparent rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                       Scanning…
                     </span>
                   ) : (
@@ -336,30 +336,43 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
               </div>
             </div>
 
-            {/* Quick Suggestions / Sample tags */}
-            <div className="flex flex-wrap items-center gap-2 mt-3">
-              <span className="text-[11px] font-mono text-bone-dim">Quick fill:</span>
-              {QUICK_SAMPLES.map((sampleName) => (
-                <button
-                  key={sampleName}
-                  type="button"
-                  onClick={() => setCompany(sampleName)}
-                  className="px-2.5 py-1 rounded-lg text-xs font-mono text-bone-dim hover:text-bone bg-[#112130]/60 hover:bg-[#183149] border border-line/60 transition-colors"
-                >
-                  {sampleName.split(' ')[0]}
-                </button>
-              ))}
+            {/* Quick Suggestions & Direct Dashboard Action */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-mono text-[#888888]">Quick fill:</span>
+                {QUICK_SAMPLES.map((sampleName) => (
+                  <button
+                    key={sampleName}
+                    type="button"
+                    onClick={() => {
+                      setCompany(sampleName);
+                    }}
+                    className="px-3 py-1 rounded-lg text-xs font-mono text-[#888888] hover:text-[#F5E59F] bg-[#0A0A0A] hover:bg-[#141414] border border-[#1E1E1E] transition-colors cursor-pointer"
+                  >
+                    {sampleName.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[#D4AF37] hover:text-[#F5E59F] transition-colors cursor-pointer"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>Explore all IPOs on Dashboard →</span>
+              </button>
             </div>
 
             {/* DRHP Upload Dropzone + Sample Button */}
             <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <label
-                className={`flex-1 flex items-center gap-3 px-4 py-3 border rounded-xl text-xs sm:text-sm cursor-pointer transition-all duration-300 ${
+                className={`flex-1 flex items-center gap-3 px-4 py-3 border rounded-2xl text-xs sm:text-sm cursor-pointer transition-all duration-300 ${
                   file
-                    ? 'border-solid border-clear/70 bg-clear/10 text-bone shadow-[0_0_20px_rgba(143,224,174,0.15)]'
+                    ? 'border-solid border-emerald-500/70 bg-emerald-500/10 text-white shadow-[0_0_20px_rgba(16,185,129,0.15)]'
                     : isDragging
-                    ? 'border-beam bg-beam/15 text-bone scale-[1.01] shadow-[0_0_30px_rgba(127,216,232,0.3)]'
-                    : 'border-dashed border-[#27435E] bg-[#112130]/50 text-bone-dim hover:border-beam/60 hover:bg-beam/5 hover:text-bone'
+                    ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white scale-[1.01] shadow-[0_0_30px_rgba(212,175,55,0.3)]'
+                    : 'border-dashed border-[#222222] bg-[#0A0A0A] text-[#888888] hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 hover:text-white'
                 }`}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -378,12 +391,12 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                 <span
                   className={`grid place-items-center w-10 h-10 flex-none rounded-xl border transition-colors ${
                     file 
-                      ? 'border-clear/60 bg-clear/20 text-clear' 
-                      : 'border-[#27435E] bg-[#172C40] text-beam'
+                      ? 'border-emerald-500/60 bg-emerald-500/20 text-emerald-400' 
+                      : 'border-[#222222] bg-[#121212] text-[#D4AF37]'
                   }`}
                 >
                   {file ? (
-                    <FileCheck className="w-5 h-5 text-clear" />
+                    <FileCheck className="w-5 h-5 text-emerald-400" />
                   ) : (
                     <UploadCloud className="w-5 h-5" />
                   )}
@@ -392,13 +405,13 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                   {file ? (
                     <div className="flex items-center justify-between gap-2">
                       <div className="truncate">
-                        <strong className="font-semibold text-bone block truncate">{file.name}</strong>
-                        <span className="text-clear font-mono text-xs">{(file.size / 1048576).toFixed(1)} MB · Ready for agent ingestion</span>
+                        <strong className="font-semibold text-white block truncate">{file.name}</strong>
+                        <span className="text-emerald-400 font-mono text-xs">{(file.size / 1048576).toFixed(1)} MB · Ready for agent ingestion</span>
                       </div>
                       <button
                         type="button"
                         onClick={removeFile}
-                        className="p-1 rounded hover:bg-critical/20 text-critical"
+                        className="p-1 rounded hover:bg-rose-500/20 text-rose-400"
                         title="Remove file"
                       >
                         <X className="w-4 h-4" />
@@ -406,8 +419,8 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                     </div>
                   ) : (
                     <div>
-                      <span className="font-medium text-bone block">Attach DRHP PDF (Optional)</span>
-                      <span className="text-[#6E8497] text-xs">If omitted, web agents fetch the prospectus automatically</span>
+                      <span className="font-semibold text-white block">Attach DRHP PDF (Optional)</span>
+                      <span className="text-[#666666] text-xs">If omitted, web agents fetch the prospectus automatically</span>
                     </div>
                   )}
                 </div>
@@ -418,17 +431,17 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleSample}
-                className="group inline-flex items-center justify-center gap-2 bg-[#122436]/80 hover:bg-[#1A334C] text-bone border border-[#27435E] hover:border-beam/50 rounded-xl px-5 py-3 text-xs sm:text-sm font-medium transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-beam/60 whitespace-nowrap"
+                className="group inline-flex items-center justify-center gap-2 bg-[#0A0A0A] hover:bg-[#141414] text-white border border-[#222222] hover:border-[#D4AF37]/50 rounded-2xl px-5 py-3 text-xs sm:text-sm font-semibold transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/60 whitespace-nowrap"
                 id="sampleBtn"
               >
-                <Play className="w-4 h-4 text-beam group-hover:scale-110 transition-transform" />
+                <Play className="w-4 h-4 text-[#D4AF37] group-hover:scale-110 transition-transform" />
                 <span>Run sample case</span>
               </button>
             </div>
 
             {/* Error / Alert notice */}
             {formMsg && (
-              <div className="mt-3.5 p-3 rounded-xl border border-medium/40 bg-medium/10 text-sm text-medium flex items-center gap-2.5 animate-fadeIn" role="alert">
+              <div className="mt-3.5 p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-sm text-amber-300 flex items-center gap-2.5 animate-fadeIn" role="alert">
                 <AlertTriangle className="w-4 h-4 flex-none" />
                 <span>{formMsg}</span>
               </div>
@@ -436,50 +449,43 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
           </form>
         </div>
 
-        {/* ───────── Right Column: Interactive DRHP Prospectus Sheet ───────── */}
+        {/* Right Column: Interactive DRHP Prospectus Sheet */}
         <div className="ix-fade relative" style={{ animationDelay: '0.35s' }}>
-          {/* Ambient colored spotlight halo behind document */}
-          <div className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-beam/20 via-[#1F3D5E]/20 to-critical/15 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-[#D4AF37]/15 via-[#8F7322]/10 to-rose-500/10 blur-3xl" aria-hidden="true" />
 
-          {/* Floating Live Detection Count Pill */}
-          <div className="ix-float hidden sm:flex absolute -top-5 -right-3 z-30 items-center gap-3 px-4 py-2 rounded-full border border-line bg-[#091522]/90 backdrop-blur-xl text-xs text-bone shadow-[0_12px_40px_-10px_rgba(0,0,0,0.85)]">
+          {/* Floating Detection Count Pill */}
+          <div className="ix-float hidden sm:flex absolute -top-5 -right-3 z-30 items-center gap-3 px-4 py-2 rounded-full border border-[#222222] bg-[#0A0A0A]/90 backdrop-blur-xl text-xs text-white shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
             <span className="relative flex w-2 h-2">
-              <span className="absolute inline-flex w-full h-full rounded-full bg-critical opacity-75 animate-ping" />
-              <span className="relative inline-flex w-2 h-2 rounded-full bg-critical" />
+              <span className="absolute inline-flex w-full h-full rounded-full bg-rose-500 opacity-75 animate-ping" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-rose-500" />
             </span>
             <div className="flex items-center gap-2 font-mono text-[11px]">
-              <span className="text-critical font-bold">{critical} CRITICAL</span>
-              <span className="text-bone-dim">·</span>
-              <span className="text-high font-bold">{high} HIGH RISK</span>
+              <span className="text-rose-400 font-bold">{critical} CRITICAL</span>
+              <span className="text-[#666666]">·</span>
+              <span className="text-amber-400 font-bold">{high} HIGH RISK</span>
             </div>
           </div>
 
           <div className="relative">
-            {/* Multi-layered paper depth effect */}
-            <div className="absolute inset-0 rounded-xl bg-paper/20 rotate-3 translate-x-3.5 translate-y-3.5 shadow-md" aria-hidden="true" />
-            <div className="absolute inset-0 rounded-xl bg-paper/40 rotate-[1.5deg] translate-x-2 translate-y-2 shadow-sm" aria-hidden="true" />
-
             {/* The Forensic Prospectus Sheet */}
-            <div className="relative overflow-hidden bg-paper text-ink rounded-xl p-6 sm:p-9 font-['Source_Serif_4'] text-sm sm:text-base leading-relaxed shadow-[0_0_0_1px_rgba(127,216,232,0.25),0_0_80px_-15px_rgba(127,216,232,0.35),0_40px_90px_-25px_rgba(0,0,0,0.85)] -rotate-1 transition-transform hover:rotate-0 duration-500">
-              {/* Cyan top scanner border highlight */}
-              <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-transparent via-beam to-transparent" aria-hidden="true" />
+            <div className="relative overflow-hidden bg-[#0A0A0A] text-[#EEEEEE] border border-[#222222] rounded-2xl p-6 sm:p-9 font-['Source_Serif_4'] text-sm sm:text-base leading-relaxed shadow-[0_0_0_1px_rgba(212,175,55,0.2),0_0_70px_-15px_rgba(212,175,55,0.25),0_40px_90px_rgba(0,0,0,0.95)] -rotate-1 transition-transform hover:rotate-0 duration-500">
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" aria-hidden="true" />
 
-              {/* Watermark */}
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.035] -rotate-45 select-none font-['Bricolage_Grotesque'] text-7xl font-black uppercase text-ink">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.035] -rotate-45 select-none font-['Cinzel'] text-7xl font-black uppercase text-white">
                 DRHP ARCHIVE
               </div>
 
               {/* Sheet Header */}
-              <header className="flex justify-between items-center font-['Bricolage_Grotesque'] text-xs text-ink-dim border-b border-[#CBD0C6] pb-3 mb-4">
-                <span className="font-mono tracking-wider font-semibold text-[#3D4C59]">
+              <header className="flex justify-between items-center text-xs text-[#888888] border-b border-[#1A1A1A] pb-3 mb-4">
+                <span className="font-mono tracking-wider font-semibold text-[#AAAAAA]">
                   DRAFT RED HERRING PROSPECTUS
                 </span>
-                <span className="px-2 py-0.5 rounded bg-ink/5 border border-ink/10 font-mono text-[11px]">
+                <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] font-mono text-[11px] text-[#D4AF37]">
                   PAGE 142
                 </span>
               </header>
 
-              <h2 className="text-xl sm:text-2xl font-bold mb-2.5 tracking-tight font-['Source_Serif_4'] text-[#0D1824]">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2.5 tracking-tight font-['Cinzel'] text-white">
                 Our business
               </h2>
               <p>
@@ -514,7 +520,7 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                 .
               </p>
 
-              <h3 className="text-lg font-bold mt-4 mb-1.5 font-['Source_Serif_4'] text-[#0D1824]">
+              <h3 className="text-lg font-bold mt-4 mb-1.5 font-['Cinzel'] text-white">
                 Our management
               </h3>
               <p>
@@ -526,8 +532,8 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
 
               {/* Laser Scanning Beam */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-                <div className="ix-scan absolute left-[-15%] right-[-15%] h-[90px] mix-blend-multiply bg-gradient-to-b from-transparent via-beam/35 to-transparent">
-                  <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[#2EAECA] shadow-[0_0_18px_4px_rgba(127,216,232,0.9)]" />
+                <div className="ix-scan absolute left-[-15%] right-[-15%] h-[90px] mix-blend-screen bg-gradient-to-b from-transparent via-[#D4AF37]/25 to-transparent">
+                  <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[#D4AF37] shadow-[0_0_18px_4px_rgba(212,175,55,0.8)]" />
                 </div>
               </div>
             </div>
@@ -543,15 +549,15 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                   key={m.id}
                   onMouseEnter={() => setActiveId(m.id)}
                   onMouseLeave={() => setActiveId(null)}
-                  className={`group relative overflow-hidden text-xs leading-snug pl-3.5 pr-3 py-3 rounded-xl border border-l-4 bg-[#112130]/75 backdrop-blur-md transition-all duration-300 cursor-pointer ${
+                  className={`group relative overflow-hidden text-xs leading-snug pl-3.5 pr-3 py-3 rounded-xl border border-l-4 bg-[#080808] backdrop-blur-md transition-all duration-300 cursor-pointer ${
                     isActive 
-                      ? 'bg-[#183149] -translate-y-1 shadow-[0_16px_35px_-12px_rgba(0,0,0,0.8)] scale-[1.02]' 
-                      : 'border-line/70 hover:border-beam/40 hover:bg-[#14293D]'
+                      ? 'bg-[#121212] -translate-y-1 shadow-[0_16px_35px_-12px_rgba(0,0,0,0.9)] scale-[1.02]' 
+                      : 'border-[#1C1C1C] hover:border-[#D4AF37]/40 hover:bg-[#0E0E0E]'
                   }`}
                   style={{
                     borderLeftColor: color,
                     borderColor: isActive ? color : undefined,
-                    boxShadow: isActive ? `0 14px 35px -12px ${color}88` : undefined,
+                    boxShadow: isActive ? `0 14px 35px -12px ${color}66` : undefined,
                   }}
                 >
                   <div className="flex items-center justify-between gap-1 mb-1">
@@ -562,18 +568,18 @@ export default function Hero({ onStart, isLive, isSubmitting }) {
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }} />
                       {m.sev}
                     </strong>
-                    <span className="text-[10px] font-mono text-bone-dim uppercase">
+                    <span className="text-[10px] font-mono text-[#888888] uppercase">
                       {m.category}
                     </span>
                   </div>
-                  <p className="text-bone text-[12px] leading-snug">{m.note}</p>
+                  <p className="text-white text-[12px] leading-snug font-sans">{m.note}</p>
                 </li>
               );
             })}
           </ul>
 
-          <div className="flex items-center justify-between text-xs text-[#6E8497] mt-4 font-mono">
-            <span>* Simulated case based on typical SME prospectus findings.</span>
+          <div className="flex items-center justify-between text-xs text-[#666666] mt-4 font-mono">
+            <span>* Simulated case based on verified SME prospectus findings.</span>
             <span>Kalindi Smart Mobility</span>
           </div>
         </div>

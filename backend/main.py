@@ -635,4 +635,16 @@ def index():
     return FileResponse(LEGACY / "index.html")
 
 
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API route not found")
+    target = STATIC_DIR / full_path
+    if full_path and target.is_file():
+        return FileResponse(target)
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return FileResponse(LEGACY / "index.html")
+
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

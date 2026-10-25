@@ -1,35 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
+  ShieldAlert, 
   Terminal, 
   Cpu, 
   Clock, 
   ExternalLink, 
+  Radio, 
   CheckCircle2, 
-  Building2, 
-  Briefcase, 
-  UserCheck, 
-  MapPin, 
-  TrendingUp,
-  Radio,
+  AlertTriangle,
+  Building2,
+  Users,
+  Briefcase,
+  FileText,
+  MapPin,
   Eye
 } from 'lucide-react';
 
-const TYPE_NAMES = {
-  company: 'Issuer',
-  vendor: 'Vendor',
-  client: 'Client',
-  director: 'Director',
-  address: 'Address',
-  financial: 'Financials',
-};
-
 const TYPE_ICONS = {
   company: Building2,
-  vendor: Building2,
-  client: Briefcase,
-  director: UserCheck,
+  promoter: Users,
+  vendor: Briefcase,
+  customer: Briefcase,
+  claim: FileText,
   address: MapPin,
-  financial: TrendingUp,
+};
+
+const TYPE_NAMES = {
+  company: 'Company',
+  promoter: 'Promoter',
+  vendor: 'Vendor',
+  customer: 'Customer',
+  claim: 'Claim',
+  address: 'Address',
 };
 
 const SEV_NAMES = {
@@ -53,29 +55,24 @@ const SEV_COLORS = {
 // Smooth count-up hook for numbers
 function useAnimatedCount(targetValue = 0, duration = 650) {
   const [displayValue, setDisplayValue] = useState(targetValue);
-  const prevRef = useRef(targetValue);
 
   useEffect(() => {
-    let startTimestamp = null;
-    const startNum = prevRef.current;
-    const endNum = Number(targetValue || 0);
-    const diff = endNum - startNum;
-    if (diff === 0) return;
-
+    let startTime = null;
     let frameId;
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      // easeOutExpo
-      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      const current = Math.round(startNum + diff * eased);
+    const initialValue = displayValue;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // easeOutCubic
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(initialValue + (targetValue - initialValue) * easedProgress);
       setDisplayValue(current);
-      prevRef.current = current;
 
       if (progress < 1) {
         frameId = requestAnimationFrame(step);
       }
-    };
+    }
 
     frameId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frameId);
@@ -102,7 +99,7 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
   const dialColor = 
     clampedScore >= 60 ? '#FF5A4E' : 
     clampedScore >= 30 ? '#FFC23D' : 
-    '#8FE0AE';
+    '#D4AF37';
 
   const riskLabel = 
     clampedScore >= 60 ? 'CRITICAL RISK' : 
@@ -110,32 +107,31 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
     'NORMAL RANGE';
 
   return (
-    <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-12 lg:py-20 border-t border-line" id="case">
+    <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-12 lg:py-20 border-t border-white/10 bg-black" id="case">
       {/* Background ambient radar glow */}
       <div 
-        className="pointer-events-none absolute -top-32 -left-32 w-[34rem] h-[34rem] rounded-full blur-[140px] opacity-25 transition-colors duration-1000" 
+        className="pointer-events-none absolute -top-32 -left-32 w-[34rem] h-[34rem] rounded-full blur-[140px] opacity-15 transition-colors duration-1000" 
         style={{ backgroundColor: dialColor }}
         aria-hidden="true" 
       />
-      <div className="pointer-events-none absolute bottom-0 right-0 w-[30rem] h-[30rem] rounded-full bg-beam/[0.06] blur-[140px]" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 bg-grid-fintech opacity-20" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-0 right-0 w-[30rem] h-[30rem] rounded-full bg-[#D4AF37]/[0.02] blur-[140px]" aria-hidden="true" />
 
       <div className="relative">
         {/* Investigation Header */}
-        <header className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-end pb-6 border-b border-line/70">
+        <header className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-end pb-6 border-b border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="relative flex w-2.5 h-2.5">
-                <span className="absolute inline-flex w-full h-full rounded-full bg-critical opacity-75 animate-ping" />
-                <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-critical" />
+                <span className="absolute inline-flex w-full h-full rounded-full bg-rose-500 opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-rose-500" />
               </span>
-              <span className="font-mono text-xs font-semibold tracking-wider text-beam uppercase">
+              <span className="font-mono text-xs font-semibold tracking-wider text-[#D4AF37] uppercase">
                 {demo ? 'SIMULATED FORENSIC MONITOR' : 'LIVE AUTONOMOUS AGENT RADAR'}
               </span>
-              <span className="text-bone-dim text-xs font-mono">· DOCKET AUDIT IN PROGRESS</span>
+              <span className="text-zinc-500 text-xs font-mono">· DOCKET AUDIT IN PROGRESS</span>
             </div>
             
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight font-['Bricolage_Grotesque'] bg-gradient-to-r from-bone via-[#EAFBFF] to-beam bg-clip-text text-transparent">
+            <h2 className="text-3xl sm:text-5xl font-cinzel font-bold tracking-tight text-white">
               {company}
             </h2>
           </div>
@@ -144,33 +140,33 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
           <div className="flex flex-wrap items-center gap-3">
             {/* Realtime Stats Pills */}
             <div className="flex items-center gap-2">
-              <div className="px-3.5 py-2 rounded-xl border border-line/80 bg-[#122334]/80 backdrop-blur-md shadow-inner flex items-center gap-3">
-                <Cpu className="w-4 h-4 text-beam" />
+              <div className="px-4 py-2.5 rounded-xl border border-white/10 bg-[#080808] flex items-center gap-3">
+                <Cpu className="w-4 h-4 text-[#D4AF37]" />
                 <div>
-                  <b className="block text-lg text-bone font-mono tabular-nums leading-none">
+                  <b className="block text-lg text-white font-mono tabular-nums leading-none">
                     {stats.agents}
                   </b>
-                  <span className="text-[10px] font-mono text-bone-dim uppercase">Agents</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Agents</span>
                 </div>
               </div>
 
-              <div className="px-3.5 py-2 rounded-xl border border-line/80 bg-[#122334]/80 backdrop-blur-md shadow-inner flex items-center gap-3">
-                <Terminal className="w-4 h-4 text-[#A8E8F2]" />
+              <div className="px-4 py-2.5 rounded-xl border border-white/10 bg-[#080808] flex items-center gap-3">
+                <Terminal className="w-4 h-4 text-white" />
                 <div>
-                  <b className="block text-lg text-bone font-mono tabular-nums leading-none">
+                  <b className="block text-lg text-white font-mono tabular-nums leading-none">
                     {stats.steps}
                   </b>
-                  <span className="text-[10px] font-mono text-bone-dim uppercase">Steps</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Steps</span>
                 </div>
               </div>
 
-              <div className="px-3.5 py-2 rounded-xl border border-line/80 bg-[#122334]/80 backdrop-blur-md shadow-inner flex items-center gap-3">
-                <Clock className="w-4 h-4 text-beam" />
+              <div className="px-4 py-2.5 rounded-xl border border-white/10 bg-[#080808] flex items-center gap-3">
+                <Clock className="w-4 h-4 text-[#D4AF37]" />
                 <div>
-                  <b className="block text-lg text-bone font-mono tabular-nums leading-none">
+                  <b className="block text-lg text-white font-mono tabular-nums leading-none">
                     {elapsedTime.toFixed(1)}s
                   </b>
-                  <span className="text-[10px] font-mono text-bone-dim uppercase">Elapsed</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Elapsed</span>
                 </div>
               </div>
             </div>
@@ -178,7 +174,7 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
         </header>
 
         {/* Phase Stepper Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 my-6 p-3 rounded-2xl border border-line/80 bg-[#0E1C2B]/80 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 my-6 p-3 rounded-2xl border border-white/10 bg-[#080808]">
           {/* Phase steps */}
           <ol className="flex items-center gap-2 list-none m-0 p-0 overflow-x-auto text-xs font-mono">
             {phases.map((p, idx) => {
@@ -189,18 +185,18 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                   key={p}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border transition-all duration-300 capitalize whitespace-nowrap ${
                     isCurrent
-                      ? 'text-[#091724] bg-gradient-to-r from-beam via-[#A3EAF7] to-beam bg-[length:200%_auto] border-transparent font-bold shadow-[0_0_20px_rgba(127,216,232,0.45)]'
+                      ? 'text-black bg-gradient-to-r from-[#D4AF37] via-[#F5E59F] to-[#D4AF37] border-transparent font-bold shadow-md shadow-[#D4AF37]/30'
                       : isDonePhase
-                      ? 'text-clear border-clear/30 bg-clear/10 font-medium'
-                      : 'text-[#5F778C] border-line/50 bg-film-2/30'
+                      ? 'text-[#8FE0AE] border-[#8FE0AE]/30 bg-[#8FE0AE]/10 font-medium'
+                      : 'text-zinc-500 border-white/5 bg-black'
                   }`}
                 >
                   {isDonePhase ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-clear" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#8FE0AE]" />
                   ) : isCurrent ? (
-                    <span className="w-2 h-2 rounded-full bg-[#091724] animate-ping" />
+                    <span className="w-2 h-2 rounded-full bg-black animate-ping" />
                   ) : (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#5F778C]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
                   )}
                   <span>{p}</span>
                 </li>
@@ -209,8 +205,8 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
           </ol>
 
           {/* Phase Label Telemetry Banner */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-beam/30 bg-beam/10 text-beam text-xs font-mono">
-            <Radio className="w-3.5 h-3.5 animate-pulse text-beam" />
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#F5E59F] text-xs font-mono">
+            <Radio className="w-3.5 h-3.5 animate-pulse text-[#D4AF37]" />
             <span className="font-medium truncate">{phaseLabel || 'Analyzing claims in progress…'}</span>
           </div>
         </div>
@@ -218,21 +214,21 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
         {/* Main 3-Column Board Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_320px] gap-6 items-start">
           {/* ───────── Left Aside: Extracted DRHP Claims ───────── */}
-          <aside className="lg:sticky top-24 relative overflow-hidden bg-paper text-ink rounded-2xl p-5 shadow-[0_0_0_1px_rgba(127,216,232,0.18),0_30px_70px_-25px_rgba(0,0,0,0.8)] border border-[#CBD0C6]">
-            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-transparent via-beam to-transparent" aria-hidden="true" />
+          <aside className="lg:sticky top-24 relative overflow-hidden bg-[#FAF8F5] text-[#121212] rounded-2xl p-5 shadow-2xl border border-[#D8DCD3]">
+            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" aria-hidden="true" />
             
             <div className="flex items-center justify-between border-b border-[#CBD0C6] pb-2.5 mb-3">
-              <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-ink-dim">
+              <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-[#555]">
                 Extracted Claims
               </h3>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-ink/5 border border-ink/10 text-ink-dim">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-black/5 border border-black/10 text-[#555]">
                 {claims.length} claims
               </span>
             </div>
 
             <ul className="space-y-0 divide-y divide-[#D8DCD3] text-xs sm:text-sm list-none p-0 m-0 max-h-[65vh] overflow-y-auto pr-1">
               {claims.length === 0 ? (
-                <li className="py-4 text-ink-dim italic text-center font-mono text-xs">
+                <li className="py-4 text-[#777] italic text-center font-mono text-xs">
                   Extracting claims from offer document…
                 </li>
               ) : (
@@ -241,22 +237,22 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                   const isChecking = c.state === 'checking';
 
                   return (
-                    <li key={c.id} className="py-2.5 pl-4 relative font-['Source_Serif_4'] leading-snug transition-colors hover:bg-ink/[0.04] rounded-lg">
+                    <li key={c.id} className="py-2.5 pl-4 relative font-playfair leading-snug transition-colors hover:bg-black/[0.03] rounded-lg">
                       {/* State beacon dot */}
                       <span
                         className={`absolute left-0 top-3 w-2 h-2 rounded-full transition-colors ${
-                          isChecking ? 'bg-[#2EAECA] animate-ping' : ''
+                          isChecking ? 'bg-[#D4AF37] animate-ping' : ''
                         }`}
                         style={{
-                          backgroundColor: c.worst ? SEV_COLORS[c.worst] : isChecking ? '#2EAECA' : '#B0B6AB',
+                          backgroundColor: c.worst ? SEV_COLORS[c.worst] : isChecking ? '#D4AF37' : '#B0B6AB',
                         }}
                       />
 
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <small className="flex items-center gap-1 font-['Bricolage_Grotesque'] text-[11px] font-semibold text-ink-dim uppercase">
-                          <Icon className="w-3 h-3 text-[#5A6573]" />
+                        <small className="flex items-center gap-1 font-cinzel text-[11px] font-semibold text-[#555] uppercase">
+                          <Icon className="w-3 h-3 text-[#777]" />
                           <span>{TYPE_NAMES[c.type] || c.type}</span>
-                          {c.page ? <span className="font-mono text-[#7C8894]">· p. {c.page}</span> : ''}
+                          {c.page ? <span className="font-mono text-[#888]">· p. {c.page}</span> : ''}
                         </small>
                         {c.worst && (
                           <span 
@@ -272,9 +268,9 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                         )}
                       </div>
 
-                      <span className="font-semibold text-ink text-[13px] block">{c.name}</span>
+                      <span className="font-semibold text-black text-[13px] block">{c.name}</span>
                       {c.detail && c.type !== 'company' && (
-                        <small className="block text-ink-dim text-[11px] font-sans mt-0.5 line-clamp-2">
+                        <small className="block text-[#666] text-[11px] font-sans mt-0.5 line-clamp-2">
                           {c.detail}
                         </small>
                       )}
@@ -289,36 +285,36 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
           <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-4">
             {Object.values(lanes).map((lane) => {
               const isFinished = lane.finished;
-              const borderColor = lane.sev ? SEV_COLORS[lane.sev] : '#27435E';
+              const borderColor = lane.sev ? SEV_COLORS[lane.sev] : 'rgba(255, 255, 255, 0.1)';
               const isWorking = !isFinished;
 
               return (
                 <article
                   key={lane.id}
-                  className="bg-gradient-to-br from-[#132637] via-[#0E1C2B] to-[#0A1622] border rounded-2xl p-4 flex flex-col gap-3 min-h-[230px] relative overflow-hidden transition-all duration-300 hover:-translate-y-1 shadow-[0_16px_36px_-16px_rgba(0,0,0,0.7)]"
+                  className="bg-[#080808] border rounded-2xl p-4 flex flex-col gap-3 min-h-[230px] relative overflow-hidden transition-all duration-300 hover:-translate-y-1 shadow-xl"
                   style={{
                     borderColor,
                     boxShadow: lane.sev
-                      ? `0 20px 45px -20px rgba(0,0,0,0.8), 0 0 30px -10px ${SEV_COLORS[lane.sev]}66`
-                      : '0 20px 45px -20px rgba(0,0,0,0.8)',
+                      ? `0 20px 45px -20px rgba(0,0,0,0.9), 0 0 25px -10px ${SEV_COLORS[lane.sev]}44`
+                      : '0 20px 45px -20px rgba(0,0,0,0.9)',
                   }}
                 >
                   {/* Active Laser Sweep */}
                   {isWorking && (
-                    <div className="absolute left-0 right-0 top-0 h-[2.5px] bg-gradient-to-r from-transparent via-beam to-transparent animate-sweep shadow-[0_0_12px_rgba(127,216,232,0.9)]" />
+                    <div className="absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-sweep shadow-[0_0_12px_rgba(212,175,55,0.9)]" />
                   )}
 
                   {/* Lane Header */}
                   <div className="flex justify-between items-center gap-2 text-xs">
-                    <span className="font-mono text-[11px] font-semibold text-beam flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-beam" />
+                    <span className="font-mono text-[11px] font-semibold text-[#D4AF37] flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
                       {lane.label}
                     </span>
                     <span
-                      className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#091522] border uppercase tracking-wider"
+                      className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-black border uppercase tracking-wider"
                       style={{ 
-                        color: lane.sev ? SEV_COLORS[lane.sev] : '#7FD8E8',
-                        borderColor: lane.sev ? `${SEV_COLORS[lane.sev]}50` : '#27435E'
+                        color: lane.sev ? SEV_COLORS[lane.sev] : '#D4AF37',
+                        borderColor: lane.sev ? `${SEV_COLORS[lane.sev]}50` : 'rgba(212, 175, 55, 0.3)'
                       }}
                     >
                       {lane.sev ? SEV_NAMES[lane.sev] : 'Checking'}
@@ -326,34 +322,34 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                   </div>
 
                   {/* Target Claim */}
-                  <p className="font-['Source_Serif_4'] text-sm sm:text-base text-bone font-medium leading-snug line-clamp-2">
+                  <p className="font-playfair text-sm sm:text-base text-white font-medium leading-snug line-clamp-2">
                     {lane.target}
                   </p>
 
                   {/* Terminal Steps Log */}
-                  <div className="mt-auto pt-2.5 border-t border-line/60 bg-[#07111A]/80 -mx-4 -mb-4 p-3 rounded-b-2xl">
-                    <div className="flex items-center justify-between text-[10px] font-mono text-bone-dim mb-1">
+                  <div className="mt-auto pt-2.5 border-t border-white/5 bg-black -mx-4 -mb-4 p-3 rounded-b-2xl">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1">
                       <span>TERMINAL STREAM</span>
-                      <span className="tabular-nums text-beam">{lane.elapsed}s</span>
+                      <span className="tabular-nums text-[#D4AF37]">{lane.elapsed}s</span>
                     </div>
 
-                    <ul className="font-mono text-[11px] text-bone-dim grid gap-1 min-h-[50px] list-none p-0 m-0">
+                    <ul className="font-mono text-[11px] text-zinc-400 grid gap-1 min-h-[50px] list-none p-0 m-0">
                       {lane.steps.slice(-3).map((step, idx) => (
-                        <li key={idx} className={`flex gap-1.5 truncate ${step.error ? 'text-critical' : 'text-bone-dim'}`}>
-                          <span className="text-beam flex-none">›</span>
+                        <li key={idx} className={`flex gap-1.5 truncate ${step.error ? 'text-rose-400' : 'text-zinc-400'}`}>
+                          <span className="text-[#D4AF37] flex-none">›</span>
                           <span className="truncate">{step.text}</span>
                         </li>
                       ))}
                     </ul>
 
                     {/* Footer URL / Finding */}
-                    <div className="flex justify-between items-center text-xs text-bone-dim pt-2 mt-1 border-t border-[#1C3348]/60">
+                    <div className="flex justify-between items-center text-xs text-zinc-500 pt-2 mt-1 border-t border-white/5">
                       {lane.liveUrl && lane.liveUrl.startsWith('http') ? (
                         <a
                           href={lane.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-beam px-3 py-1 rounded-full border border-beam/40 bg-beam/10 hover:bg-beam/20 hover:border-beam shadow-[0_0_15px_rgba(127,216,232,0.3)] transition-all duration-300 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-beam/60 w-full justify-center"
+                          className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-[#D4AF37] px-3 py-1 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 hover:border-[#D4AF37] shadow-md transition-all duration-300 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/60 w-full justify-center"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Watch live browser</span>
@@ -364,7 +360,7 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                           {lane.topTitle}
                         </span>
                       ) : (
-                        <span className="text-[11px] font-mono text-[#586F82]">Autonomous browser active…</span>
+                        <span className="text-[11px] font-mono text-zinc-600">Autonomous browser active…</span>
                       )}
                     </div>
                   </div>
@@ -374,15 +370,15 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
           </div>
 
           {/* ───────── Right Aside: Live Chronometer Risk Meter & Flag Feed ───────── */}
-          <aside className="lg:sticky top-24 relative overflow-hidden bg-gradient-to-br from-[#122436]/90 to-[#0A1622]/90 backdrop-blur-xl border border-line rounded-2xl p-5 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.85)]">
+          <aside className="lg:sticky top-24 relative overflow-hidden bg-[#080808] border border-white/10 rounded-2xl p-5 shadow-2xl">
             <div 
-              className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl opacity-25 transition-colors duration-700" 
+              className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl opacity-15 transition-colors duration-700" 
               style={{ backgroundColor: dialColor }} 
               aria-hidden="true" 
             />
 
-            <div className="flex items-center justify-between border-b border-line/60 pb-2.5 mb-4">
-              <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-bone-dim">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-4">
+              <h3 className="text-xs font-bold font-mono tracking-wider uppercase text-zinc-400">
                 Real-Time Risk Gauge
               </h3>
               <span 
@@ -397,7 +393,7 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
             <div className="relative w-44 mx-auto my-3">
               <svg viewBox="0 0 120 120" className="w-full -rotate-90">
                 {/* Gauge Background Track */}
-                <circle cx="60" cy="60" r="50" fill="none" strokeWidth="8" stroke="#172C3F" />
+                <circle cx="60" cy="60" r="50" fill="none" strokeWidth="8" stroke="#181818" />
                 
                 {/* Dynamic Value Arc */}
                 <circle
@@ -417,38 +413,38 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
 
               {/* Animated Center Score Readout */}
               <div className="absolute inset-0 flex flex-col items-center justify-center m-0">
-                <span className="text-[10px] font-mono text-bone-dim uppercase tracking-wider -mb-1">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider -mb-1">
                   FRAUD PROBABILITY
                 </span>
                 <b 
-                  className="text-4xl font-extrabold font-['Bricolage_Grotesque'] tabular-nums leading-tight"
+                  className="text-4xl font-extrabold font-mono tabular-nums leading-tight"
                   style={{ color: dialColor, textShadow: `0 0 20px ${dialColor}66` }}
                 >
                   {animatedScore}
                 </b>
-                <span className="text-bone-dim font-mono text-xs">/100</span>
+                <span className="text-zinc-500 font-mono text-xs">/100</span>
               </div>
             </div>
 
             {/* Live Flag Stream Header */}
-            <div className="flex items-center justify-between mt-6 mb-2 border-t border-line/60 pt-3">
-              <span className="text-xs font-mono font-semibold text-bone">
+            <div className="flex items-center justify-between mt-6 mb-2 border-t border-white/10 pt-3">
+              <span className="text-xs font-mono font-semibold text-white">
                 Discovered Flags ({flags.length})
               </span>
-              <span className="w-2 h-2 rounded-full bg-beam animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
             </div>
 
             {/* Flag Feed */}
             <ul className="space-y-2.5 max-h-[46vh] overflow-y-auto pr-1 list-none p-0 m-0">
               {flags.length === 0 ? (
-                <li className="p-4 border border-dashed border-line/70 rounded-xl text-xs text-bone-dim text-center font-mono">
+                <li className="p-4 border border-dashed border-white/10 rounded-xl text-xs text-zinc-500 text-center font-mono">
                   Autonomous agents scanning registries… Flags will appear here.
                 </li>
               ) : (
                 flags.map((f, idx) => (
                   <li
                     key={idx}
-                    className="bg-[#0A1624]/90 border border-line/60 border-l-4 rounded-xl p-3 text-xs leading-snug shadow-md transition-all duration-300 hover:bg-[#122436] hover:translate-x-0.5"
+                    className="bg-black border border-white/10 border-l-4 rounded-xl p-3 text-xs leading-snug shadow-md transition-all duration-300 hover:border-white/20 hover:translate-x-0.5"
                     style={{ borderLeftColor: SEV_COLORS[f.severity] }}
                   >
                     <div className="flex justify-between items-center mb-1">
@@ -464,8 +460,8 @@ export default function LiveInvestigation({ investigation, elapsedTime }) {
                         </span>
                       )}
                     </div>
-                    <strong className="block text-bone font-medium text-[13px]">{f.title}</strong>
-                    <small className="block text-bone-dim mt-0.5 text-[11px] truncate font-mono">{f.target}</small>
+                    <strong className="block text-white font-medium text-[13px]">{f.title}</strong>
+                    <small className="block text-zinc-400 mt-0.5 text-[11px] truncate font-mono">{f.target}</small>
                   </li>
                 ))
               )}

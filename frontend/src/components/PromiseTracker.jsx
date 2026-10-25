@@ -6,41 +6,36 @@ import {
   HelpCircle, 
   AlertTriangle, 
   Bell, 
-  Filter, 
   Search, 
-  FileText, 
-  ExternalLink,
-  Building2, 
-  Briefcase,
   ArrowRight
 } from 'lucide-react';
 
 const STATUS_CONFIG = {
   'Met': {
     color: '#8FE0AE',
-    bg: 'bg-clear/15',
-    border: 'border-clear/40',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
     icon: CheckCircle2,
     desc: 'Fully corroborated by post-listing annual reports or exchange disclosures.'
   },
   'Partially Met': {
     color: '#FFC23D',
-    bg: 'bg-medium/15',
-    border: 'border-medium/40',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/30',
     icon: Clock,
     desc: 'Progress reported in disclosures, but target is only partially achieved.'
   },
   'Missed': {
     color: '#FF5A4E',
-    bg: 'bg-critical/15',
-    border: 'border-critical/40',
+    bg: 'bg-rose-500/10',
+    border: 'border-rose-500/30',
     icon: AlertOctagon,
     desc: 'Subsequent filings confirm target missed, diverted proceeds, or cancelled contracts.'
   },
   'Unverified': {
-    color: '#8EA3B5',
-    bg: 'bg-unverified/15',
-    border: 'border-unverified/40',
+    color: '#A1A1AA',
+    bg: 'bg-zinc-800/40',
+    border: 'border-zinc-700/40',
     icon: HelpCircle,
     desc: 'Disclosures to date lack sufficient evidence to substantiate (distinguished from Missed).'
   }
@@ -109,31 +104,28 @@ export default function PromiseTracker({ currentCompany }) {
     setVerifyLoading(true);
     setVerifyMsg('');
     try {
-      const res = await fetch('/api/promises/verify', {
+      const res = await fetch(`/api/promises/${activePromiseForVerify.id}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          promise_id: activePromiseForVerify.id,
-          disclosure_text: disclosureText.trim(),
-          disclosure_source: disclosureSource.trim() || 'Annual Report Post-Listing'
+          disclosure_text: disclosureText,
+          disclosure_source: disclosureSource || 'Manual User Diligence Verification'
         })
       });
-      if (!res.ok) throw new Error('Verification request failed.');
-      const updated = await res.json();
-      setVerifyMsg(`Status updated to: ${updated.status}`);
-      setDisclosureText('');
-      setDisclosureSource('');
-      setActivePromiseForVerify(null);
+      if (!res.ok) throw new Error('Verification failed.');
+      const data = await res.json();
+      setVerifyMsg(`Status Updated: ${data.promise.status}`);
       fetchPromisesAndAlerts();
     } catch (err) {
-      setVerifyMsg(err.message || 'Verification error.');
+      setVerifyMsg(err.message || 'Audit verification failed.');
     } finally {
       setVerifyLoading(false);
     }
   };
 
+  // Filtered list
   const filteredPromises = promises.filter((p) => {
-    if (!searchQuery) return true;
+    if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
       p.company.toLowerCase().includes(q) ||
@@ -143,58 +135,53 @@ export default function PromiseTracker({ currentCompany }) {
   });
 
   return (
-    <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-line" id="promises">
-      {/* Background ambient lighting */}
-      <div className="pointer-events-none absolute top-1/4 right-1/4 w-[32rem] h-[32rem] rounded-full bg-beam/[0.06] blur-[150px]" aria-hidden="true" />
-      <div className="pointer-events-none absolute bottom-10 left-10 w-[30rem] h-[30rem] rounded-full bg-[#183552]/[0.25] blur-[140px]" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 bg-grid-fintech opacity-20" aria-hidden="true" />
-
+    <section className="relative overflow-hidden max-w-[1560px] mx-auto px-4 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-white/10 bg-black" id="promise-tracker">
       <div className="relative">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-line/70">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-beam/30 bg-[#0E1F2E]/80 backdrop-blur-md text-xs font-mono text-beam mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#D4AF37]/30 bg-[#080808] text-xs font-mono text-[#D4AF37] mb-3">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>POST-LISTING STATUTORY COMMITMENT AUDITING</span>
+              <span className="tracking-widest uppercase">POST-LISTING STATUTORY COMMITMENT AUDITING</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight font-['Bricolage_Grotesque'] text-bone">
+            <h2 className="text-3xl sm:text-5xl font-cinzel font-bold tracking-tight text-white">
               IPO Promise{' '}
-              <span className="bg-gradient-to-r from-beam via-[#A3EAF7] to-beam bg-clip-text text-transparent">
+              <span className="text-gold-gradient">
                 Tracker
               </span>
             </h2>
-            <p className="mt-2 text-base text-bone-dim max-w-[65ch] leading-relaxed">
+            <p className="mt-3 text-base text-zinc-400 max-w-[65ch] leading-relaxed font-sans">
               Track measurable DRHP promises—headcount, capex, revenue targets, and proceeds utilization—compared against subsequent Annual Reports and Exchange disclosures. Clear distinction between **Met, Partially Met, Missed, and Unverified**.
             </p>
           </div>
 
           {/* Search bar */}
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#091522] border border-[#27435E] text-sm w-full md:w-72">
-            <Search className="w-4 h-4 text-bone-dim flex-none" />
+          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#080808] border border-white/10 text-sm w-full md:w-72">
+            <Search className="w-4 h-4 text-zinc-500 flex-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filter company or promise..."
-              className="bg-transparent border-0 text-bone text-xs outline-none placeholder:text-bone-dim/60 w-full"
+              className="bg-transparent border-0 text-white text-xs outline-none placeholder:text-zinc-600 w-full font-sans"
             />
           </div>
         </div>
 
         {/* Active Disclosures / Alerts Ticker */}
         {alerts.length > 0 && (
-          <div className="my-6 p-4 rounded-2xl border border-critical/40 bg-critical/10 backdrop-blur-md shadow-md">
-            <div className="flex items-center gap-2 font-mono text-xs font-bold text-critical uppercase mb-2">
-              <Bell className="w-4 h-4 animate-bounce text-critical" />
+          <div className="my-6 p-5 rounded-2xl border border-rose-500/30 bg-rose-500/5 shadow-xl">
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-rose-400 uppercase tracking-wider mb-3">
+              <Bell className="w-4 h-4 animate-bounce text-rose-400" />
               <span>Active Deviation & Escalation Alerts ({alerts.length})</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               {alerts.slice(0, 4).map((a) => (
-                <div key={a.id} className="p-2.5 rounded-xl bg-[#091522]/90 border border-critical/30 flex items-start gap-2">
-                  <span className="w-2 h-2 rounded-full bg-critical flex-none mt-1" />
+                <div key={a.id} className="p-3 rounded-xl bg-black border border-rose-500/20 flex items-start gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-400 flex-none mt-1.5" />
                   <div>
-                    <strong className="text-bone block">{a.company}: {a.title}</strong>
-                    <span className="text-critical text-[11px] font-mono">{a.alert_message}</span>
+                    <strong className="text-white block font-sans">{a.company}: {a.title}</strong>
+                    <span className="text-rose-400 text-[11px] font-mono mt-0.5 block">{a.alert_message}</span>
                   </div>
                 </div>
               ))}
@@ -203,19 +190,19 @@ export default function PromiseTracker({ currentCompany }) {
         )}
 
         {/* Filter Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 my-6 p-3 rounded-2xl border border-line/70 bg-[#0E1C2B]/80 backdrop-blur-md">
+        <div className="flex flex-wrap items-center justify-between gap-4 my-6 p-4 rounded-2xl border border-white/10 bg-[#080808]">
           {/* Status Pills */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-            <span className="text-bone-dim mr-1">Status:</span>
+            <span className="text-zinc-500 mr-1 uppercase tracking-wider">Status:</span>
             {['', 'Met', 'Partially Met', 'Missed', 'Unverified'].map((st) => (
               <button
                 key={st}
                 type="button"
                 onClick={() => setSelectedStatus(st)}
-                className={`px-3 py-1 rounded-xl border transition-colors ${
+                className={`px-3 py-1.5 rounded-xl border transition-colors ${
                   selectedStatus === st
-                    ? 'border-beam text-beam bg-beam/15 font-bold shadow-sm'
-                    : 'border-line/60 text-bone-dim hover:text-bone hover:border-beam/30'
+                    ? 'border-[#D4AF37] text-[#F5E59F] bg-[#D4AF37]/10 font-bold'
+                    : 'border-white/10 text-zinc-400 hover:text-white hover:border-white/20'
                 }`}
               >
                 {st || 'All Statuses'}
@@ -225,14 +212,14 @@ export default function PromiseTracker({ currentCompany }) {
 
           {/* Category Dropdown */}
           <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-bone-dim">Category:</span>
+            <span className="text-zinc-500 uppercase tracking-wider">Category:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-[#091522] border border-line text-bone text-xs outline-none cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-black border border-white/10 text-white text-xs outline-none cursor-pointer font-sans"
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-[#091522] text-bone">
+                <option key={cat.id} value={cat.id} className="bg-black text-white">
                   {cat.label}
                 </option>
               ))}
@@ -242,25 +229,25 @@ export default function PromiseTracker({ currentCompany }) {
 
         {/* Verification Modal / Drawer (if user selects a promise to verify) */}
         {activePromiseForVerify && (
-          <div className="my-6 p-6 rounded-3xl border border-beam/60 bg-[#0A1624] shadow-2xl animate-fadeIn">
-            <div className="flex items-center justify-between mb-4 border-b border-line/60 pb-3">
-              <h4 className="font-['Bricolage_Grotesque'] text-lg font-bold text-bone">
+          <div className="my-6 p-6 sm:p-8 rounded-3xl border border-[#D4AF37]/40 bg-[#080808] shadow-2xl">
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h4 className="font-cinzel text-lg font-bold text-white">
                 Verify Commitment Against New Public Disclosure
               </h4>
               <button
                 type="button"
                 onClick={() => setActivePromiseForVerify(null)}
-                className="text-xs font-mono text-bone-dim hover:text-bone px-2 py-1 rounded bg-film-2"
+                className="text-xs font-mono text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-black border border-white/10"
               >
                 Close ✕
               </button>
             </div>
-            <p className="text-xs text-bone-dim mb-3 font-mono">
-              Auditing: <strong className="text-bone">{activePromiseForVerify.company}</strong> — "{activePromiseForVerify.title}"
+            <p className="text-xs text-zinc-400 mb-4 font-mono">
+              Auditing: <strong className="text-white">{activePromiseForVerify.company}</strong> — "{activePromiseForVerify.title}"
             </p>
-            <form onSubmit={handleVerifyCommitment} className="space-y-3">
+            <form onSubmit={handleVerifyCommitment} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-bone-dim uppercase mb-1">
+                <label className="block text-xs font-mono text-zinc-400 uppercase mb-1.5 tracking-wider">
                   Subsequent Filing Source / URL / Citation:
                 </label>
                 <input
@@ -268,11 +255,11 @@ export default function PromiseTracker({ currentCompany }) {
                   value={disclosureSource}
                   onChange={(e) => setDisclosureSource(e.target.value)}
                   placeholder="e.g. FY2025 Annual Report Page 42, NSE Filing NSE/SME/2026/041"
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#07111A] border border-line text-bone text-xs outline-none focus:border-beam"
+                  className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/10 text-white text-xs outline-none focus:border-[#D4AF37] font-sans"
                 />
               </div>
               <div>
-                <label className="block text-xs font-mono text-bone-dim uppercase mb-1">
+                <label className="block text-xs font-mono text-zinc-400 uppercase mb-1.5 tracking-wider">
                   Excerpts from Subsequent Statutory Disclosure:
                 </label>
                 <textarea
@@ -280,18 +267,18 @@ export default function PromiseTracker({ currentCompany }) {
                   value={disclosureText}
                   onChange={(e) => setDisclosureText(e.target.value)}
                   placeholder="Paste the relevant section from the annual report, exchange disclosure, or auditor notes..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#07111A] border border-line text-bone text-xs outline-none focus:border-beam"
+                  className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/10 text-white text-xs outline-none focus:border-[#D4AF37] font-sans"
                 />
               </div>
               <div className="flex items-center gap-3">
                 <button
                   type="submit"
                   disabled={verifyLoading}
-                  className="px-5 py-2 rounded-xl bg-beam text-[#091724] font-bold text-xs shadow-md hover:bg-[#A3EAF7] transition-all cursor-pointer disabled:opacity-60"
+                  className="btn-gold px-6 py-2.5 rounded-xl text-black font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40 cursor-pointer disabled:opacity-60 font-sans"
                 >
                   {verifyLoading ? 'Auditing with AI…' : 'Run Audit Verification'}
                 </button>
-                {verifyMsg && <span className="text-xs font-mono text-beam">{verifyMsg}</span>}
+                {verifyMsg && <span className="text-xs font-mono text-[#D4AF37]">{verifyMsg}</span>}
               </div>
             </form>
           </div>
@@ -306,7 +293,7 @@ export default function PromiseTracker({ currentCompany }) {
             return (
               <article
                 key={p.id}
-                className={`relative overflow-hidden p-6 rounded-3xl border bg-gradient-to-br from-[#122436]/90 via-[#0E1C2B]/90 to-[#0A1622]/90 shadow-md transition-all duration-300 hover:-translate-y-1 ${cfg.border}`}
+                className={`relative overflow-hidden p-6 rounded-3xl border bg-[#080808] shadow-xl transition-all duration-300 hover:border-[#D4AF37]/40 ${cfg.border}`}
               >
                 {/* Top Status Accent Header */}
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -318,50 +305,50 @@ export default function PromiseTracker({ currentCompany }) {
                     <span>{p.status}</span>
                   </span>
 
-                  <span className="text-[11px] font-mono text-bone-dim">
+                  <span className="text-[11px] font-mono text-zinc-500">
                     {p.measurement_period}
                   </span>
                 </div>
 
                 <div className="mb-2">
-                  <span className="text-[11px] font-mono text-beam uppercase font-semibold block">
+                  <span className="text-[10px] font-mono text-[#D4AF37] uppercase font-semibold tracking-wider block">
                     {p.company} · {p.category.replace(/_/g, ' ')}
                   </span>
-                  <h3 className="font-['Bricolage_Grotesque'] text-lg sm:text-xl font-bold text-bone mt-0.5">
+                  <h3 className="font-cinzel text-lg sm:text-xl font-bold text-white mt-1">
                     {p.title}
                   </h3>
                 </div>
 
                 {/* Original Quotation from DRHP */}
-                <div className="my-3.5 p-3.5 rounded-xl border border-line/60 bg-[#08121B]/80 font-['Source_Serif_4'] italic text-sm text-bone-dim leading-relaxed">
+                <div className="my-3.5 p-4 rounded-xl border border-white/5 bg-black font-playfair italic text-sm text-zinc-300 leading-relaxed">
                   "{p.quotation}"
-                  <span className="block not-italic font-mono text-[10px] text-beam mt-1.5">
+                  <span className="block not-italic font-mono text-[10px] text-[#D4AF37] mt-2">
                     Source: {p.source_ref}
                   </span>
                 </div>
 
                 {/* Baseline vs Target */}
                 <div className="grid grid-cols-2 gap-2 my-3 font-mono text-xs">
-                  <div className="p-2.5 rounded-xl bg-film-2/40 border border-line/50">
-                    <span className="text-[10px] text-bone-dim uppercase block">Baseline at Filing</span>
-                    <strong className="text-bone text-[11px] block truncate">{p.baseline_val || 'N/A'}</strong>
+                  <div className="p-3 rounded-xl bg-black border border-white/5">
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">Baseline at Filing</span>
+                    <strong className="text-zinc-200 text-xs block truncate mt-0.5">{p.baseline_val || 'N/A'}</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-film-2/40 border border-line/50">
-                    <span className="text-[10px] text-beam uppercase block">Promised Target</span>
-                    <strong className="text-beam text-[11px] block truncate">{p.target_val || 'N/A'}</strong>
+                  <div className="p-3 rounded-xl bg-black border border-white/5">
+                    <span className="text-[10px] text-[#D4AF37] uppercase tracking-wider block">Promised Target</span>
+                    <strong className="text-[#F5E59F] text-xs block truncate mt-0.5">{p.target_val || 'N/A'}</strong>
                   </div>
                 </div>
 
                 {/* Subsequent Disclosure Evidence Section */}
                 {p.evidence_quote && (
-                  <div className="mt-3 p-3 rounded-xl border border-line/80 bg-[#091522] text-xs">
-                    <span className="font-mono text-[10px] text-bone-dim uppercase font-semibold block mb-1">
+                  <div className="mt-3 p-3.5 rounded-xl border border-white/10 bg-black text-xs font-sans">
+                    <span className="font-mono text-[10px] text-zinc-400 uppercase font-semibold tracking-wider block mb-1">
                       Post-Listing Disclosure Evidence:
                     </span>
-                    <p className="text-bone text-[11px] leading-relaxed mb-1.5">
+                    <p className="text-zinc-300 text-xs leading-relaxed mb-2">
                       {p.evidence_quote}
                     </p>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-bone-dim pt-1 border-t border-line/40">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 pt-2 border-t border-white/5">
                       <span className="truncate">{p.evidence_source}</span>
                       <span>Verified: {p.verification_date}</span>
                     </div>
@@ -370,14 +357,14 @@ export default function PromiseTracker({ currentCompany }) {
 
                 {/* Alert pill if discrepancy exists */}
                 {p.alert_message && p.alert_severity !== 'none' && (
-                  <div className="mt-3 p-2.5 rounded-xl bg-critical/10 border border-critical/30 text-critical text-xs flex items-start gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 flex-none mt-0.5" />
-                    <span className="text-[11px] leading-snug">{p.alert_message}</span>
+                  <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 flex-none text-rose-400 mt-0.5" />
+                    <span className="text-[11px] leading-relaxed font-mono">{p.alert_message}</span>
                   </div>
                 )}
 
                 {/* Action button: Audit with new filing */}
-                <div className="mt-4 pt-3 border-t border-line/50 flex justify-end">
+                <div className="mt-4 pt-3 border-t border-white/10 flex justify-end">
                   <button
                     type="button"
                     onClick={() => {
@@ -386,7 +373,7 @@ export default function PromiseTracker({ currentCompany }) {
                       setDisclosureSource('');
                       setVerifyMsg('');
                     }}
-                    className="inline-flex items-center gap-1.5 text-xs font-mono text-beam hover:text-[#A3EAF7] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono text-[#D4AF37] hover:text-[#F5E59F] transition-colors cursor-pointer"
                   >
                     <span>Audit with New Disclosure</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -398,7 +385,7 @@ export default function PromiseTracker({ currentCompany }) {
         </div>
 
         {filteredPromises.length === 0 && !loading && (
-          <div className="p-8 text-center text-bone-dim font-mono text-xs border border-dashed border-line rounded-3xl mt-6">
+          <div className="p-10 text-center text-zinc-500 font-mono text-xs border border-dashed border-white/10 rounded-3xl mt-6">
             No promises matched the selected filters.
           </div>
         )}

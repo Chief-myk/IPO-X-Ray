@@ -43,13 +43,13 @@ export function Lanes({ lanes }) {
   return (
     <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {list.map(([id, a]) => (
-        <div key={id} className={`rounded-xl border p-3 bg-film/60 ${a.state === 'done' ? 'border-clear/60' : a.state === 'fail' ? 'border-medium/60' : 'border-line'}`}>
-          <div className="text-[11px] uppercase tracking-wider text-bone-dim">{a.kind.replace('_', ' ')} agent</div>
-          <div className="font-semibold text-sm text-bone truncate" title={a.target}>{a.target}</div>
-          <div className={`text-xs mt-1.5 line-clamp-2 ${a.err ? 'text-medium' : 'text-bone-dim'}`}>
+        <div key={id} className={`rounded-2xl border p-4 bg-[#080808] ${a.state === 'done' ? 'border-[#8FE0AE]/50' : a.state === 'fail' ? 'border-[#FF5A4E]/50' : 'border-white/10'}`}>
+          <div className="text-[10px] uppercase font-mono tracking-wider text-[#D4AF37]">{a.kind.replace('_', ' ')} agent</div>
+          <div className="font-semibold text-sm text-white truncate mt-0.5" title={a.target}>{a.target}</div>
+          <div className={`text-xs mt-1.5 line-clamp-2 ${a.err ? 'text-[#FF8A3D]' : 'text-zinc-400'}`}>
             {a.state === 'done' ? `Done${a.cache ? ' (from cache)' : ''}` : a.state === 'fail' ? (a.error || 'Not found') : a.text}
           </div>
-          {a.live && <div className="text-xs mt-1"><SourceLink url={a.live}>Watch the browser live</SourceLink></div>}
+          {a.live && <div className="text-xs mt-2"><SourceLink url={a.live}>Watch the browser live</SourceLink></div>}
         </div>
       ))}
     </div>
@@ -64,15 +64,15 @@ export function SourceLink({ url, children = 'source' }) {
     try { label = new URL(url).hostname.replace(/^www\./, ''); } catch { label = 'source'; }
   }
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="text-beam hover:underline break-all">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] hover:text-[#F5E59F] underline underline-offset-4 decoration-[#D4AF37]/40 break-all font-mono text-xs">
       {label}
     </a>
   );
 }
 
 export const inputCls =
-  'bg-film border border-line rounded-lg px-3 py-2 text-sm text-bone placeholder:text-bone-dim/60 focus:outline-none focus:ring-2 focus:ring-beam/50';
+  'bg-black border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all font-sans';
 export const btnCls =
-  'px-4 py-2 rounded-lg text-sm font-medium border border-line bg-film-2 text-bone hover:border-beam/60 hover:text-beam transition-colors disabled:opacity-50 disabled:cursor-wait';
+  'px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider border border-white/10 bg-[#080808] text-zinc-300 hover:border-[#D4AF37]/50 hover:text-white transition-all disabled:opacity-50 disabled:cursor-wait font-sans cursor-pointer';
 export const btnPrimaryCls =
-  'px-4 py-2 rounded-lg text-sm font-semibold text-film bg-gradient-to-r from-beam to-[#A8E8F2] shadow-[0_0_20px_rgba(127,216,232,0.3)] hover:shadow-[0_0_28px_rgba(127,216,232,0.55)] transition-all disabled:opacity-50 disabled:cursor-wait';
+  'btn-gold px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-black shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40 transition-all disabled:opacity-50 disabled:cursor-wait font-sans cursor-pointer';
