@@ -1,0 +1,189 @@
+{
+  "n_rows": 66,
+  "n_positive": 16,
+  "threshold": 0.5,
+  "excluded_leaky_features": [
+    "company_court_cases",
+    "company_sebi_orders",
+    "complaints_count",
+    "director_sebi_orders"
+  ],
+  "time_split": {
+    "test_rows": 20,
+    "test_positives": 1,
+    "current": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0
+    },
+    "real_gb": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.059,
+      "roc_auc": 0.158
+    },
+    "real_logreg": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.05,
+      "roc_auc": 0.0
+    },
+    "mix_gb": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.056,
+      "roc_auc": 0.105
+    },
+    "mix_logreg": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.05,
+      "roc_auc": 0.0
+    },
+    "mix_logreg_ind": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.05,
+      "roc_auc": 0.0
+    },
+    "mix_logreg_ind_tuned": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.05,
+      "roc_auc": 0.0
+    },
+    "all_clean": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.05,
+      "roc_auc": 0.5
+    }
+  },
+  "cv": {
+    "real_gb": {
+      "precision": {
+        "mean": 0.318,
+        "std": 0.093
+      },
+      "recall": {
+        "mean": 0.225,
+        "std": 0.05
+      },
+      "f1": {
+        "mean": 0.263,
+        "std": 0.066
+      },
+      "pr_auc": {
+        "mean": 0.293,
+        "std": 0.018
+      }
+    },
+    "real_logreg": {
+      "precision": {
+        "mean": 0.3,
+        "std": 0.12
+      },
+      "recall": {
+        "mean": 0.163,
+        "std": 0.064
+      },
+      "f1": {
+        "mean": 0.207,
+        "std": 0.075
+      },
+      "pr_auc": {
+        "mean": 0.349,
+        "std": 0.036
+      }
+    },
+    "mix_gb": {
+      "precision": {
+        "mean": 0.381,
+        "std": 0.068
+      },
+      "recall": {
+        "mean": 0.25,
+        "std": 0.055
+      },
+      "f1": {
+        "mean": 0.299,
+        "std": 0.056
+      },
+      "pr_auc": {
+        "mean": 0.378,
+        "std": 0.071
+      }
+    },
+    "mix_logreg": {
+      "precision": {
+        "mean": 0.388,
+        "std": 0.122
+      },
+      "recall": {
+        "mean": 0.125,
+        "std": 0.056
+      },
+      "f1": {
+        "mean": 0.183,
+        "std": 0.073
+      },
+      "pr_auc": {
+        "mean": 0.35,
+        "std": 0.027
+      }
+    },
+    "mix_logreg_ind": {
+      "precision": {
+        "mean": 0.324,
+        "std": 0.068
+      },
+      "recall": {
+        "mean": 0.225,
+        "std": 0.03
+      },
+      "f1": {
+        "mean": 0.263,
+        "std": 0.037
+      },
+      "pr_auc": {
+        "mean": 0.352,
+        "std": 0.015
+      }
+    },
+    "mix_logreg_ind_tuned": {
+      "precision": {
+        "mean": 0.292,
+        "std": 0.063
+      },
+      "recall": {
+        "mean": 0.55,
+        "std": 0.108
+      },
+      "f1": {
+        "mean": 0.378,
+        "std": 0.069
+      },
+      "pr_auc": {
+        "mean": 0.361,
+        "std": 0.028
+      }
+    }
+  },
+  "current_all_rows": {
+    "precision": 0.667,
+    "recall": 0.125,
+    "f1": 0.211,
+    "pr_auc": 0.366,
+    "roc_auc": 0.456
+  },
+  "saved_model": "mix_logreg_ind_tuned"
+}

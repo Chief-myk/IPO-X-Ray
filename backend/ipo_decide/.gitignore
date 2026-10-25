@@ -1,0 +1,3 @@
+__pycache__
+# trained on first start from data/ + the synthetic bootstrap; rebuilt whenever real data changes
+models/

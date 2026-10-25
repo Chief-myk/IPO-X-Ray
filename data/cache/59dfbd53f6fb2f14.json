@@ -1,0 +1,116 @@
+{
+  "label": "regulator:Rohit Malhotra",
+  "goal": "Search sebi.gov.in enforcement orders, SEBI press releases and investor caution notices for \"Rohit Malhotra\". Return any order or caution that is clearly about this exact person or entity (title, date, URL). Return empty lists if the search ran and found nothing about them. Use only public pages, do not log in, and do not guess: if something cannot be found, return null or an empty list for it. Include the page URL where you saw each fact. Be quick and stop as soon as you have the answer.",
+  "url": "https://www.bing.com/search?q=%22Rohit+Malhotra%22+site%3Asebi.gov.in+order+OR+caution",
+  "result": {
+    "orders": [],
+    "cautions": []
+  },
+  "sources": [],
+  "steps": [
+    {
+      "text": "Search SEBI site for Rohit Malhotra orders or cautions",
+      "url": null
+    },
+    {
+      "text": "Get search results for Rohit Malhotra on SEBI site",
+      "url": null
+    },
+    {
+      "text": "Check for SEBI search results for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Check second page of SEBI search results",
+      "url": null
+    },
+    {
+      "text": "Visit SEBI enforcement orders page directly",
+      "url": null
+    },
+    {
+      "text": "Visit SEBI orders and cautions page",
+      "url": null
+    },
+    {
+      "text": "Visit SEBI orders page directly",
+      "url": null
+    },
+    {
+      "text": "Search SEBI enforcement orders for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Submit search for Rohit Malhotra in SEBI orders",
+      "url": null
+    },
+    {
+      "text": "Visit SEBI press releases page",
+      "url": null
+    },
+    {
+      "text": "Search SEBI for Rohit Malhotra enforcement orders and cautions",
+      "url": null
+    },
+    {
+      "text": "Submit search for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Reset search to navigate to orders page",
+      "url": null
+    },
+    {
+      "text": "Toggle search to switch to enforcement orders",
+      "url": null
+    },
+    {
+      "text": "Toggle Media & Notifications to collapse",
+      "url": null
+    },
+    {
+      "text": "Toggle Media & Notifications accordion",
+      "url": null
+    },
+    {
+      "text": "Navigate away from current section",
+      "url": null
+    },
+    {
+      "text": "Collapse Media & Notifications section",
+      "url": null
+    },
+    {
+      "text": "Visit SEBI enforcement orders page directly",
+      "url": null
+    },
+    {
+      "text": "Search for Rohit Malhotra in SEBI orders",
+      "url": null
+    },
+    {
+      "text": "Submit search for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Get SEBI search results for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Search SEBI enforcement section for Rohit Malhotra",
+      "url": null
+    },
+    {
+      "text": "Search for Rohit Malhotra in SEBI enforcement section",
+      "url": null
+    },
+    {
+      "text": "Return empty lists as no SEBI enforcement orders or cautions found for Rohit Malhotra",
+      "url": null
+    }
+  ],
+  "live_url": "https://ip-18-145-241-124.tetra-data.production.tinyfish.io/tf-33f81d92-0908-4c6d-97c4-57118201b484/stream/0",
+  "error": null,
+  "fetched_at": "2026-10-24T11:42:58Z",
+  "from_cache": false
+}

@@ -1,0 +1,88 @@
+{
+  "n_real": 200,
+  "n_real_test": 40,
+  "old": {
+    "baseline_board": {
+      "n": 40,
+      "coverage": 0.825,
+      "avg_width": 68.1,
+      "interval_score": 88.2,
+      "mae_median": 17.5,
+      "direction_accuracy": 0.686,
+      "gain_positive": {
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.75
+      }
+    },
+    "baseline_gmp": {
+      "n": 40,
+      "coverage": 0.775,
+      "avg_width": 52.7,
+      "interval_score": 74.2,
+      "mae_median": 15.1,
+      "direction_accuracy": 0.714,
+      "gain_positive": {
+        "precision": 0.615,
+        "recall": 1.0,
+        "f1": 0.762
+      }
+    },
+    "cqr": {
+      "n": 40,
+      "coverage": 0.675,
+      "avg_width": 39.1,
+      "interval_score": 65.1,
+      "mae_median": 13.8,
+      "direction_accuracy": 0.771,
+      "gain_positive": {
+        "precision": 0.71,
+        "recall": 0.917,
+        "f1": 0.8
+      }
+    }
+  },
+  "new": {
+    "baseline_board": {
+      "n": 40,
+      "coverage": 0.725,
+      "avg_width": 90.0,
+      "interval_score": 121.6,
+      "mae_median": 20.5,
+      "direction_accuracy": 0.686,
+      "gain_positive": {
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.75
+      }
+    },
+    "baseline_gmp": {
+      "n": 40,
+      "coverage": 0.825,
+      "avg_width": 66.7,
+      "interval_score": 84.9,
+      "mae_median": 16.2,
+      "direction_accuracy": 0.743,
+      "gain_positive": {
+        "precision": 0.632,
+        "recall": 1.0,
+        "f1": 0.774
+      }
+    },
+    "cqr": {
+      "n": 40,
+      "coverage": 1.0,
+      "avg_width": 87.6,
+      "interval_score": 87.6,
+      "mae_median": 16.7,
+      "direction_accuracy": 0.771,
+      "gain_positive": {
+        "precision": 0.71,
+        "recall": 0.917,
+        "f1": 0.8
+      }
+    }
+  },
+  "old_chosen": "cqr",
+  "new_chosen": "baseline_gmp"
+}
